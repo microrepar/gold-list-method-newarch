@@ -1,0 +1,16 @@
+{
+    "material-icon-theme.folders.associations": {
+        "core": "rules",
+        "adapters": "pipe",
+        "external": "tools",
+        "pages": "rules",
+        "user": "admin",        
+    },
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "files.exclude": {
+        "**/*.pyc": {"when": "$(basename).py"},
+        "**/__pycache__": true,
+        "**/*.pytest_cache": true,
+    }
+}

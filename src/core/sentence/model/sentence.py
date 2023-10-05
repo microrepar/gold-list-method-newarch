@@ -1,0 +1,52 @@
+import datetime
+
+from ...shared.utils import date_to_string
+
+
+class Sentence:
+    def __init__(self, *,
+                 id_              : int=None,
+                 created_at       : datetime.date=None,
+                 foreign_language : str=None,
+                 mother_tongue    : str=None,
+                 foreign_idiom    : str=None,
+                 mother_idiom     : str=None
+                 ):
+        self.id               = id_
+        self.created_at       = created_at
+        self.foreign_language = foreign_language
+        self.mother_tongue    = mother_tongue
+        self.foreign_idiom    = foreign_idiom
+        self.mother_idiom     = mother_idiom
+    
+    def data_to_dataframe(self):
+        return [
+            {
+                'id'               : self.id,
+                'created_at'       : self.created_at,
+                'foreign_language' : self.foreign_language,
+                'mother_tongue'    : self.mother_tongue,
+                'foreign_idiom'    : self.foreign_idiom,
+                'mother_idiom'     : self.mother_idiom,
+            }
+        ]
+    
+    def data_to_redis(self):
+        return{
+                'id'               : self.id,
+                'created_at'       : date_to_string(self.created_at),
+                'foreign_language' : self.foreign_language,
+                'mother_tongue'    : self.mother_tongue,
+                'foreign_idiom'    : self.foreign_idiom,
+                'mother_idiom'     : self.mother_idiom,
+            }
+    
+    def __str__(self):
+        return (
+            f'Sentence('
+                f'id_={self.id}, '
+                f'created_at={self.created_at}, '
+                f'foreign_language={self.foreign_language}, '
+                f'mother_tongue={self.mother_tongue} '
+            f')'
+        )
