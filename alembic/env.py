@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from external.persistence.sqlalchemyorm.model.base import Base
+from src.external.persistence.sqlalchemyorm.model.base import Base
 
 load_dotenv()
 
@@ -21,6 +21,7 @@ DB_PORT     = os.getenv('DB_PORT')
 DB_DATABASE = os.getenv('DB_DATABASE')
 DB_SCHEMA   = os.getenv('DB_SCHEMA')
 
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -31,13 +32,19 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [Base.metadata]
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# recovers the schema if it is missing in the table metadata
+schema_name = None
+for table_name in target_metadata.tables.keys():
+    schema_name = target_metadata.tables.get(table_name, target_metadata).schema
+    if schema_name is not None:
+        break
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -57,7 +64,6 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True,
     )
 
     with context.begin_transaction():
@@ -78,15 +84,21 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, 
-            target_metadata=target_metadata,
-            version_table_schema=target_metadata[-1].schema,
-            compare_type=True,
-            # include_schemas=True,
-        )
-
-        connection.execute(f'CREATE SCHEMA IF NOT EXISTS {target_metadata[-1].schema}')
+        if schema_name:
+            context.configure(
+                connection=connection, 
+                target_metadata=target_metadata,
+                version_table_schema=schema_name,
+                compare_type=True,
+                # include_schemas=True,
+            )
+            connection.execute(f'CREATE SCHEMA IF NOT EXISTS {schema_name}')
+        else:
+            context.configure(
+                connection=connection, 
+                target_metadata=target_metadata,
+                compare_type=True,
+            )
 
         with context.begin_transaction():
             context.run_migrations()

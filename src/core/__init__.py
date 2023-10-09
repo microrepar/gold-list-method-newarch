@@ -28,5 +28,6 @@ def usecase_map(resource=None):
     return wrapper
 
 
-from .notebook.service import notebook_all, notebook_registry, notebook_remove
+from .notebook.service import notebook_all, notebook_registry, notebook_remove, notebook_by_id
 from .pagesection.service import pagesection_get_all, pagesection_registry
+# from .sentence.service import sentence_get_all, sentence_registry

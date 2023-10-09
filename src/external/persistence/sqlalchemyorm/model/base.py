@@ -3,12 +3,14 @@ import json
 from typing import List
 
 from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Float,
-                        ForeignKey, Integer, MetaData, String, Table, Text, Sequence)
+                        ForeignKey, Integer, MetaData, Sequence, String, Table,
+                        Text)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from src.core.notebook import Notebook
-from src.core.pagesection import PageSection
+from src.core.pagesection import Group, PageSection
+from src.core.sentence import Sentence
 
 Base = declarative_base(metadata=MetaData(schema='gold_list_method'))
 metadata = Base.metadata
@@ -31,13 +33,6 @@ class NotebookModel(Base):
     
     @classmethod
     def notebook_model_to_entity(cls, model: 'NotebookModel'):       
-        
-        pagesection_entity_list = []        
-        for pagesection_model in model.page_section_list:
-            pagesection_entity_list.appen(
-                PageSection.pagesection_model_to_entity(pagesection_model)
-            )       
-
         return Notebook(
             id_=model.id,
             name=model.name,
@@ -47,7 +42,6 @@ class NotebookModel(Base):
             days_period=model.days_period,
             foreign_idiom=model.foreign_idiom,
             mother_idiom=model.mother_idiom,
-            page_section_list=pagesection_entity_list
         )
     
     @classmethod
@@ -61,12 +55,6 @@ class NotebookModel(Base):
                              foreign_idiom=entity.foreign_idiom,
                              mother_idiom=entity.mother_idiom)
         
-        pagesection_model_list = []
-        for pagesection_entity in entity.page_section_list:
-            pagesection_model_list.append(
-                PageSection.pagesection_entity_to_model(pagesection_entity)
-            )            
-    
         return notebook_model
     
 
@@ -88,7 +76,7 @@ class PageSectionModel(Base):
     __table_args__ = {"schema": "gold_list_method"}
 
     id = Column(Integer, primary_key=True)
-    section_number = Column(Integer, Sequence('section_number_seq', start=1, increment=1), unique=True)
+    section_number = Column(Integer)
     page_number = Column(Integer)
     group = Column(String(1))
     created_at = Column(Date)
@@ -121,12 +109,40 @@ class PageSectionModel(Base):
         self._memorializeds = json.dumps(bool_list)
     
     @classmethod
-    def pagesection_model_to_entity(cls, model: 'PageSectionModel'):
-        pass
+    def pagesection_model_to_entity(cls, model: 'PageSectionModel') -> PageSection:
+        entity = PageSection(
+                id_=model.id,
+                section_number=model.section_number,
+                page_number=model.page_number,                
+                created_at=model.created_at,
+                created_by=model.created_by,
+                distillation_at=model.distillation_at,
+                distillation_actual=model.distillation_actual,
+                distillated=model.distillated
+        )
+        entity.group = Group(model.group)
+        entity.translated_sentences = model.translated_sentences
+        entity.memorializeds = model.memorializeds
+
+        return entity
     
     @classmethod        
-    def pagesection_entity_to_model(cls, entity: PageSection):
-        pass
+    def pagesection_entity_to_model(cls, entity: PageSection) -> 'PageSectionModel':
+        model = cls(
+            id=entity.id,
+            section_number=entity.section_number,
+            page_number=entity.page_number,
+            group=entity.group.value,
+            created_at=entity.created_at,
+            created_by=entity.created_by,
+            distillation_at=entity.distillation_at,
+            distillation_actual=entity._distillation_actual,
+            distillated=entity.distillated,
+            translated_sentences=entity.translated_sentences,
+            memorializeds=entity.memorializeds
+        )
+
+        return model
 
 
 
@@ -145,3 +161,24 @@ class SentenceModel(Base):
 
     page_sections = relationship('PageSectionModel', secondary=pagesection_sentence_assoc, back_populates='sentences')
 
+    @classmethod
+    def sentence_model_to_entity(cls, model: 'SentenceModel') -> Sentence:
+        return Sentence(
+            id_=model.id,
+            created_at=model.created_at,
+            foreign_language=model.foreign_language,
+            mother_tongue=model.mother_tongue,
+            foreign_idiom=model.foreign_idiom,
+            mother_idiom=model.mother_idiom
+        )
+    
+    @classmethod        
+    def sentence_entity_to_model(cls, entity: PageSection) -> 'SentenceModel':
+        return cls(
+            id=entity.id,
+            created_at=entity.created_at,
+            foreign_language=entity.foreign_language,
+            mother_tongue=entity.mother_tongue,
+            foreign_idiom=entity.foreign_idiom,
+            mother_idiom=entity.mother_idiom
+        )

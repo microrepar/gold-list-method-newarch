@@ -13,6 +13,23 @@ class PageSectionRepository(Protocol):
         """
 
     @abstractmethod
-    def get_all(self) -> List[PageSection]:
+    def get_all(self, entity: PageSection = None) -> List[PageSection]:
         """Get all registred PageSections in database
         """
+
+    @abstractmethod
+    def get_by_id(self, entity: PageSection) -> PageSection:
+        """Get by id a registred PageSection in database
+        """
+    
+    @abstractmethod
+    def find_by_field(self, entity: PageSection) -> List[PageSection]:
+        """Get by id a registred PageSection in database
+        """
+    
+    @abstractmethod
+    def get_last_page_number(self, entity: PageSection) -> int:
+        """Get next page number to PageSection
+        """
+
+    

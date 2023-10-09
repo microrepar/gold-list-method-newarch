@@ -3,8 +3,8 @@ from enum import Enum
 from typing import List
 
 from ...notebook import Notebook
-
 from ...sentence.model.sentence import Sentence
+from ...shared.entity import Entity
 from ...shared.utils import date_to_string
 
 
@@ -17,8 +17,7 @@ class Group(Enum):
     NEW_PAGE = 'NP'
 
 
-
-class PageSection:
+class PageSection(Entity):
     def __init__(self, *,
                  id_                  : int=None,
                  notebook             : Notebook=None,
@@ -47,6 +46,23 @@ class PageSection:
         self._distillation_actual  = distillation_actual
         self.created_by            = created_by
         self.set_created_by(created_by)        # section_number from  PageSection
+    
+    def clone(self):
+        return self.__class__(
+            id_=None,
+            section_number=self.section_number,
+            page_number=self.page_number,
+            group=self.group,
+            created_at=self.created_at,
+            created_by=self.created_by,
+            distillation_at=self.distillation_at,
+            distillation_actual=self._distillation_actual,
+            distillated=self._distillated,
+            sentences=self.sentences,
+            translated_sentences=self.translated_sentences,
+            memorializeds=self.memorializeds,
+            notebook=self.notebook
+        )
     
     @property
     def distillated(self):
@@ -88,7 +104,7 @@ class PageSection:
         if self.notebook is not None:
             notebook_id = self.notebook.id
         return (f'PageSection('
-                    # f'id_                = {self.id}, '
+                    f'id_= {self.id}, '
                     f'section_number={self.section_number}, '
                     f'page_number={self.page_number}, '
                     f'created_at={self.created_at}, '
@@ -137,19 +153,19 @@ class PageSection:
         if self.created_by is not None:
             created_by = self.created_by.page_number
         return {    
-            # 'id'                  : [i for i in range(self.id, self.id + len(self.sentences))],
-            'section_number'      : [self.section_number for _ in range(len(self.sentences))],
-            'page_number'         : [self.page_number for _ in range(len(self.sentences))],
-            'group'               : [self.group.value for _ in range(len(self.sentences))],
-            'created_at'          : [self.created_at for _ in range(len(self.sentences))],
-            'created_by_id'       : [created_by for _ in range(len(self.sentences))],
-            'distillation_at'     : [self.distillation_at for _ in range(len(self.sentences))],
-            'distillation_actual' : [self._distillation_actual for _ in range(len(self.sentences))],
-            'distillated'         : [self._distillated for _ in range(len(self.sentences))],
-            'notebook_id'         : [self.notebook.id for _ in range(len(self.sentences))],
-            'sentence_id'         : [v.id for v in self.sentences],
-            'translated_sentence' : [v for v in self.translated_sentences],
-            'memorized'           : [v for v in self.memorializeds],
+            'id'                   : [i for i in range(self.id, self.id + len(self.sentences))],
+            # 'section_number'       : [self.section_number for _ in range(len(self.sentences))],
+            'page_number'          : [self.page_number for _ in range(len(self.sentences))],
+            'group'                : [self.group.value for _ in range(len(self.sentences))],
+            'created_at'           : [self.created_at for _ in range(len(self.sentences))],
+            'created_by_id'        : [created_by for _ in range(len(self.sentences))],
+            'distillation_at'      : [self.distillation_at for _ in range(len(self.sentences))],
+            'distillation_actual'  : [self._distillation_actual for _ in range(len(self.sentences))],
+            'distillated'          : [self._distillated for _ in range(len(self.sentences))],
+            'notebook_id'          : [self.notebook.id for _ in range(len(self.sentences))],
+            'sentence_id'          : [v.id for v in self.sentences],
+            'translated_sentences' : [v for v in self.translated_sentences],
+            'memorized'            : [v for v in self.memorializeds],
         }
     
     def data_to_redis(self):
@@ -171,3 +187,10 @@ class PageSection:
             'translated_sentence' : self.translated_sentences,
             'memorized'           : self.memorializeds,
         }
+
+    def validate_data(self):
+        if self.notebook is None or self.notebook.days_period is None:
+            return f'Notebook is none or it has not defined days_period attribute value.'
+
+        self.distillation_at = (self.created_at + datetime.timedelta(days=self.notebook.days_period))
+                

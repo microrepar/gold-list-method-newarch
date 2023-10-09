@@ -4,15 +4,14 @@ import pandas as pd
 import streamlit as st
 from st_pages import add_page_title
 
-# from core.pagesection.service_oldarch import build_page_section_with_sentence_list
+from src.adapters import Controller
 from src.core.notebook import Notebook
 from src.core.pagesection import Group
-from src.adapters.controller import Controller
 
 st.set_page_config(layout='wide')
 
-placehold_container_msg = st.container()
-placehold_container_msg.empty()
+placeholder_container_msg = st.container()
+placeholder_container_msg.empty()
 
 # Either this or add_indentation() MUST be called on each page in your
 # app to add indendation in the sidebar
@@ -82,28 +81,30 @@ if not messages:
 
     st.markdown('**Add new HeadList**')
 
-    placehold_sentences_sheet = st.empty()
+    placeholder_sentences_sheet = st.empty()
     placehold_btn_insert = st.empty()
     placehold_page_exists = st.empty()
 
 
-    df_result = placehold_sentences_sheet.data_editor(
+    df_result = placeholder_sentences_sheet.data_editor(
         df_edit,
         column_config=column_configuration_data,
         num_rows="fixed",
         hide_index=True,
         use_container_width=True,
     )
+
     df_result['remembered'] = False
     df_result['translated_sentences'] = ''
     df_result['foreign_idiom'] = notebook.foreign_idiom
     df_result['mother_idiom'] = notebook.mother_idiom
     df_result['created_at'] = selected_day
-
-
+  
 
     if selected_page_section_day is not None:
-        placehold_sentences_sheet.warning(f'⚠️There is already a page for the group {selected_page_section_day.group.value} and selected day {selected_page_section_day.created_at}!')
+        placeholder_sentences_sheet.warning(f'⚠️There is already a page for the group '
+                                            f'{selected_page_section_day.group.value} '
+                                            f'and selected day ({selected_page_section_day.created_at}).')
         
     if placehold_btn_insert.button('INSERT NEW LIST', 
                                    type='primary', 
@@ -119,9 +120,13 @@ if not messages:
         }
         df_result.rename(columns=cols_to_rename, inplace=True)
 
+        ###############################################################
+        # INSERT PAGESECTION - BODY REQUEST
+        ###############################################################
         request = {
             'resource': '/pagesection/registry',
-            'pagesection_notebook': {'notebook_id_': notebook.id},
+            'pagesection_notebook': {'notebook_id_': notebook.id,
+                                     'notebook_days_period': notebook.days_period},
             'pagesection_group': Group.HEADLIST,
             'pagesection_created_at': selected_day,
             'pagesection_translated_sentences': df_result['translated_sentences'].to_list(),
@@ -129,48 +134,42 @@ if not messages:
             'pagesection_sentences': list(df_result.T.to_dict().values()),            
         }
 
+        # FrontController
         resp = controller(request=request)
+        messages = resp.get('messages')
+        entities = resp.get('entities')
 
+        # FeedBack
+        if messages:
+            for msg in messages:
+                placeholder_container_msg.error(msg,  icon="🚨")
+                st.toast('Something went wrong!')
+        elif entities:
+            placeholder_sentences_sheet.success(f'{entities[-1]} was inserted successfully!')
+            placehold_btn_insert.empty()
+            st.toast('Page section was inserted successfully.')
 
-    
+        ###############################################################
+        # UPDATE NOTEBOOK - BODY REQUEST
+        ###############################################################
+        request = {
+            'resource': '/notebook/id',
+            'notebook_id_': notebook.id,
+        }
 
-    st.write({c: f'sentence_{c}' for c in df_result.columns})
-    # st.write(list(df_result.T.to_dict().values()))
+        resp = controller(request=request)
+        messages = resp.get('messages')
+        entities = resp.get('entities')
 
+        # FeedBack
+        if messages:
+            for msg in messages:
+                placeholder_container_msg.error(msg,  icon="🚨")
+                st.toast('Something went wrong!')
+        else:
+            notebook = entities[-1]        
 
-
-
-        
-        # try:
-        #     page_section = build_page_section_with_sentence_list(dataframe=df_result,
-        #                                                         selected_day=selected_day,
-        #                                                         notebook=notebook,
-        #                                                         group=Group.HEADLIST,
-        #                                                         persit=False)            
-        #     page_section = page_section_dao.insert(page_section)
-        #     placehold_sentences_sheet.success(f'{page_section} was inserted successfully!')
-            
-        #     # notebook.page_section_list.append(page_section)
-
-        #     page_section.distillation_at = datetime.datetime.strptime(str(selected_day), '%Y-%m-%d').date()
-        #     page_section.distillated = True
-
-        #     page_section_dao.insert(page_section)
-        
-        #     st.toast('Page section was inserted successfully.')
-        #     placehold_btn_insert.empty()
-            
-        # except Exception as error:
-        #     st.toast('Something went wrong!')
-        #     placehold_container_msg.error(str(error), icon="🚨")
-        #     if 'There is already a page'.upper() in str(error).upper():
-        #         placehold_page_exists.error(str(error), icon="🚨")
-        
-
-
-    # notebook_list = notebook_dao.get_all()
-    # notebook_dict = {n.name: n for n in notebook_list}
-    # notebook = notebook_dict.get(selected_notebook)
+        ###############################################################
 
     qty_group_a = notebook.count_page_section_by_group(group= Group.A)
     qty_group_b = notebook.count_page_section_by_group(group= Group.B)
@@ -182,23 +181,24 @@ if not messages:
     col_group_3.markdown(f'**GroupC:** {qty_group_c:0>7}')
     col_group_4.markdown(f'**GroupD:** {qty_group_d:0>7}')
 
+    if notebook.page_section_list:
+        df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook.page_section_list \
+                        if n.group == Group.A and n.created_at != n.distillation_at], ignore_index=True)
+        df = df.groupby('created_at').first().reset_index()
+        df_result = df.sort_values('created_at', ascending=False).head(5)
+
+        st.subheader('Last 5 Registred HeadLists:')
+        st.dataframe(df_result, hide_index=True, use_container_width=True)
+        st.markdown(f'Lines total: {df.shape[0]}')
+    else:
+        st.subheader('HeadLists')
+        st.markdown(':red[Atteption! There are no registred Headlists.]')
+
 else:
     st.warning('⚠️Attention! There are no notebooks registred!')
-    st.markdown('[Create a Notebook](Add%20New%20Notebook)')
+    st.markdown('[Create a Notebook](Add%20Notebook)')
 
 
 
-# st.divider()
-# # The directory containing this file
-# import os.path
-# from pathlib import Path
-# HERE = os.path.abspath(os.path.dirname(__file__))
-# sentence_file = Path(HERE).parent.parent / 'data_base' / 'sentence.parquet'
-# page_section_file = Path(HERE).parent.parent / 'data_base' / 'page_section.parquet'
-# df_page = pd.read_parquet(page_section_file)
-# df_sentence = pd.read_parquet(sentence_file)
-# st.markdown('PAGE SECTIONS')
-# st.dataframe(df_page, hide_index=True, use_container_width=True)
-# st.divider()
-# st.markdown('SENTENCES')
-# st.dataframe(df_sentence, hide_index=True, use_container_width=True)
+
+

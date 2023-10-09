@@ -1,8 +1,8 @@
 """create tables notebook, page_section and sentence
 
-Revision ID: 3eaed2b3488b
-Revises: fe5ad6220aff
-Create Date: 2023-10-04 16:27:18.030353
+Revision ID: 37b3ff1ce18c
+Revises: 
+Create Date: 2023-10-08 13:41:20.432306
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3eaed2b3488b'
-down_revision: Union[str, None] = 'fe5ad6220aff'
+revision: str = '37b3ff1ce18c'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -58,7 +58,6 @@ def upgrade() -> None:
     sa.Column('notebook_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['notebook_id'], ['gold_list_method.notebook.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('section_number'),
     schema='gold_list_method'
     )
     op.create_table('pagesection_sentence_assoc',

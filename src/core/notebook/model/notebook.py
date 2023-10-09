@@ -1,11 +1,11 @@
 import datetime
 from typing import List
-
+from ...shared.entity import Entity
 
 from ...shared.utils import date_to_string
 
 
-class Notebook:
+class Notebook(Entity):
     def __init__(self, *,
                  name              : str=None,
                  id_               : int=None,
@@ -102,5 +102,5 @@ class Notebook:
                 return page_section
     
     def count_page_section_by_group(self, *, group):
-       return len([p for p in self.page_section_list if p.group.value == group.value and not p.created_at != p.distillation_at])
+       return len([p for p in self.page_section_list if p.group.value == group.value and p.created_at != p.distillation_at])
 

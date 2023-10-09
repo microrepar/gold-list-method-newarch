@@ -87,7 +87,7 @@ class GenericViewHelper(AbstractViewHelper):
                             attr_list = []
                             for inner_value in values:
                                 attr_list.append(
-                                    self.get_entities(*inner_class_param, request=inner_value)
+                                    self.get_entities(*inner_class_param, request=inner_value)[-1]
                                 )
                 
                             kwargs[name] = attr_list

@@ -1,9 +1,9 @@
 import datetime
 
 from ...shared.utils import date_to_string
+from ...shared.entity import Entity
 
-
-class Sentence:
+class Sentence(Entity):
     def __init__(self, *,
                  id_              : int=None,
                  created_at       : datetime.date=None,
@@ -50,3 +50,6 @@ class Sentence:
                 f'mother_tongue={self.mother_tongue} '
             f')'
         )
+    
+    def validate_data(self):
+        return super().validate_data()

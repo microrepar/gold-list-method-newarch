@@ -13,8 +13,8 @@ class NotebookRegistry(UseCase):
 
     def execute(self, notebook: Notebook) -> int:
         result = Result()
+        
         result.msg = notebook.validate_data()
-
         if result.msg:
             result.entidades = notebook
             return result

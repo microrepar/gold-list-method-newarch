@@ -1,8 +1,8 @@
 import os
 
-import ptvsd
-ptvsd.enable_attach(address=('localhost', 5678))
-ptvsd.wait_for_attach() # Only include this line if you always want to attach the debugger
+# import ptvsd
+# ptvsd.enable_attach(address=('localhost', 5678))
+# ptvsd.wait_for_attach() # Only include this line if you always want to attach the debugger
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -14,8 +14,8 @@ st.set_page_config(layout='wide')
 
 show_pages(
     [   Page("streamlit_app.py", "GOLD LIST METHOD", "🪙"),
-        # Page("app/pages/calendar.py", "Calendar", "🗓️"),
-        # Page("app/pages/distillation.py", "Distillation", "🧠"),
+        Page("src/external/app_pages/calendar.py", "Calendar", "🗓️"),
+        Page("src/external/app_pages/distillation.py", "Distillation", "🧠"),
         # Section(name="Notebooks", icon=":books:"),
         # # Can use :<icon-name>: or the actual icon 
         Page("src/external/app_pages/add_new_notebook.py", "Add Notebook", "📖"),

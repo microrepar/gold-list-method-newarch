@@ -4,8 +4,7 @@ import pandas as pd
 import streamlit as st
 from st_pages import add_page_title
 
-from src.adapters.controller import Controller
-
+from src.adapters import Controller
 
 controller = Controller()
 
