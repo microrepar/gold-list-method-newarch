@@ -148,7 +148,7 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
 
     def registry(self, entity: PageSection) -> PageSection:
         try:
-
+            instance = None
             with self.database.session.begin():
 
                 has_notebook: NotebookModel = self.database.session.query(NotebookModel).filter_by(id=entity.notebook.id).one_or_none()
@@ -176,11 +176,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                 self.database.session.add(instance)
                 
 
-                new_entity = PageSectionModel.pagesection_model_to_entity(instance)
-                new_entity.notebook = NotebookModel.notebook_model_to_entity(has_notebook)
-                new_entity.sentences = [SentenceModel.sentence_model_to_entity(s) for s in new_entity.sentences]
+            new_entity = PageSectionModel.pagesection_model_to_entity(instance)
+            new_entity.notebook = NotebookModel.notebook_model_to_entity(has_notebook)
+            new_entity.sentences = [SentenceModel.sentence_model_to_entity(s) for s in instance.sentences]
 
-                return new_entity
+            return new_entity
             
         except Exception as error:
             self.database.session.rollback()

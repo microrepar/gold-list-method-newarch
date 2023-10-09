@@ -254,6 +254,7 @@ if len(notebook_list) > 0:
                         placeholder_container_msg.error(msg,  icon="🚨")
                         st.toast('Something went wrong!')
                 elif entities:
+                    page_section_group_a
                     placeholder_container_msg.success(f'{entities[-1]} was updated successfully!')
                     placeholder_container_msg.empty()
                     st.toast('Page section was updated successfully.')

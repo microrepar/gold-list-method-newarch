@@ -145,31 +145,32 @@ if not messages:
                 placeholder_container_msg.error(msg,  icon="🚨")
                 st.toast('Something went wrong!')
         elif entities:
+            notebook.page_section_list.extend(entities)
             placeholder_sentences_sheet.success(f'{entities[-1]} was inserted successfully!')
             placehold_btn_insert.empty()
             st.toast('Page section was inserted successfully.')
 
-        ###############################################################
-        # UPDATE NOTEBOOK - BODY REQUEST
-        ###############################################################
-        request = {
-            'resource': '/notebook/id',
-            'notebook_id_': notebook.id,
-        }
+        # ###############################################################
+        # # GET BY ID - NOTEBOOK - BODY REQUEST
+        # ###############################################################
+        # request = {
+        #     'resource': '/notebook/id',
+        #     'notebook_id_': notebook.id,
+        # }
 
-        resp = controller(request=request)
-        messages = resp.get('messages')
-        entities = resp.get('entities')
+        # resp = controller(request=request)
+        # messages = resp.get('messages')
+        # entities = resp.get('entities')
 
-        # FeedBack
-        if messages:
-            for msg in messages:
-                placeholder_container_msg.error(msg,  icon="🚨")
-                st.toast('Something went wrong!')
-        else:
-            notebook = entities[-1]        
+        # # FeedBack
+        # if messages:
+        #     for msg in messages:
+        #         placeholder_container_msg.error(msg,  icon="🚨")
+        #         st.toast('Something went wrong!')
+        # else:
+        #     notebook = entities[-1]        
 
-        ###############################################################
+        # ###############################################################
 
     qty_group_a = notebook.count_page_section_by_group(group= Group.A)
     qty_group_b = notebook.count_page_section_by_group(group= Group.B)

@@ -65,11 +65,11 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                     raise Exception(f'There is no notebook with id={notebook_id}.')
                 
                 entity_notebook_found = NotebookModel.notebook_model_to_entity(instance)
+                entity_notebook_found.page_section_list = list()
                     
                 for instance_page in instance.page_section_list:
                     entity_page: PageSection = None 
                     entity_page = PageSectionModel.pagesection_model_to_entity(instance_page)
-                    entity_page.notebook = entity_notebook_found
                     entity_page.sentences = list()            
 
                     instance_sentence_list = instance_page.sentences
@@ -78,8 +78,8 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                         entity_sentence = SentenceModel.sentence_model_to_entity(instance_sentence)                        
                         entity_page.sentences.append(entity_sentence)
                 
+                    entity_page.notebook = entity_notebook_found
                     entity_notebook_found.page_section_list.append(entity_page)
-
 
                 return entity_notebook_found 
             
@@ -91,7 +91,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             self.database.session.close()
 
     
-    def find_by_id(self, entity: Notebook) -> List[Notebook]:
+    def find_by_field(self, entity: Notebook) -> List[Notebook]:
         filters = dict([v for v in vars(entity).items() if not v[0].startswith('_') and bool(v[-1])])
 
         kwargs = {}
@@ -151,7 +151,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
         try:
             with self.database.session.begin():                
                 self.database.session.add(instance)                
-                return NotebookModel.notebook_model_to_entity(instance)
+            return NotebookModel.notebook_model_to_entity(instance)
         except Exception as error:
             self.database.session.rollback()
             raise error

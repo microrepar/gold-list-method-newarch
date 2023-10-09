@@ -23,6 +23,6 @@ class NotebookRepository(Protocol):
         """
     
     @abstractmethod
-    def find_by_id(self, entity: Notebook) -> List[Notebook]:
+    def find_by_field(self, entity: Notebook) -> List[Notebook]:
         """Find by id registred notebooks in database
         """

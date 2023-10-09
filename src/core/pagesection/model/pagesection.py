@@ -132,15 +132,20 @@ class PageSection(Entity):
                      'C'  : '#002BFF',
                      'D'  : '#B300B7',
                      'NP' : '#000000'}
-        sequence = {'A'  : '1st',
-                    'B'  : '2nd',
-                    'C'  : '3rd',
-                    'D'  : '4th',
-                    'NP' : '🔁'}
+        sequence = {'A'  : '1st headlist',
+                    'B'  : '2nd distillation',
+                    'C'  : '3rd distillation',
+                    'D'  : '4th distillation',
+                    'NP' : '🔁 repet headlist'}
+        after_sequence = {'B'  : ' of A',
+                          'C'  : ' of B',
+                          'D'  : ' of C',
+                          'NP' : ' of D'}
         
         return {
-            "title"      : f"{sequence.get(self.group.value, 'Indef')} Distill {self.group.value}" if self.created_at \
-                            else f" Add HeadList",
+            "title"      : (f"{self.group.value}{self.page_number} ({sequence.get(self.group.value, 'Indef')}"
+                            f"{after_sequence.get(self.group.value, '')})") \
+                                if (self.created_at != self.distillation_at) else f"Add HeadList",
             "color"      : color.get(self.group.value, color['NP']) if self.created_at \
                             else '#DCDCDC',
             "start"      : f"{self.distillation_at}",
