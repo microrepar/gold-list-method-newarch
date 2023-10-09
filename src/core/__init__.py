@@ -1,6 +1,9 @@
 """core module
 """
 
+from importlib import import_module
+import os
+from pathlib import Path
 from typing import Generic
 
 from .shared.application import Result
@@ -28,6 +31,19 @@ def usecase_map(resource=None):
     return wrapper
 
 
-from .notebook.service import notebook_all, notebook_registry, notebook_remove, notebook_by_id
-from .pagesection.service import pagesection_get_all, pagesection_registry
-# from .sentence.service import sentence_get_all, sentence_registry
+here = Path(os.path.dirname(__file__))
+for package in here.iterdir():
+    if package.is_dir():
+        for service in package.iterdir():
+            if service.is_dir() and service.name == 'service':                
+                for repository_module in service.iterdir():
+                    if repository_module.name.endswith('.py') \
+                            and not repository_module.name.startswith('_')\
+                            and not repository_module.name.endswith('_repository.py'):
+
+                        model_name = package.name
+                        service_name = service.name
+                        module_name = repository_module.name.split('.')[0]
+
+                        module = import_module('src.core.{}.{}.{}'.format(model_name, service_name, module_name))
+                        # print('src.core.{}.{}.{}'.format(model_name, service_name, module_name))
