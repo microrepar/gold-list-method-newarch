@@ -42,6 +42,8 @@ class Controller:
                    if param.annotation is not inspect.Parameter.empty and inspect.isclass(param.annotation)]
 
         # Retrieves the class name from the repository that was defined in the __init__ param from the usecase
+        if not repository_classes:
+            raise Exception(f'There are no defined repository annotation classes in {usecase} signature.')
         repo_name = repository_classes[-1].__name__
         
         # Retrieves the repository by class name
