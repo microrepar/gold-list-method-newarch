@@ -78,8 +78,7 @@ if len(notebook_list) > 0:
     dataframe, page_section_group = get_group_dataframe(selected_day, 
                                                         Group(choiced_group.split()[-1]))
 
-    # st.sidebar.divider()
-    st.sidebar.markdown("[Add New Headlist](Add%20HeadList)")
+    st.sidebar.markdown("[Show Calendar](Calendar)")
 
     column_configuration = {
         "foreign_language": st.column_config.TextColumn(
