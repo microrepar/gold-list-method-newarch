@@ -191,8 +191,10 @@ if not messages:
         df = df.groupby('created_at').first().reset_index()
         df_result = df.sort_values('created_at', ascending=False).head(5)
 
+        columns = ['created_at', 'id', 'page_number', 'group', 'distillation_at', 'distillation_actual', 'notebook_id']
+
         st.markdown('#### Last 5 Registred HeadLists:')
-        st.dataframe(df_result, hide_index=True, use_container_width=True)
+        st.dataframe(df_result[columns], hide_index=True, use_container_width=True)
         st.markdown(f'Lines total: {df.shape[0]}')
     else:
         st.subheader('HeadLists')
