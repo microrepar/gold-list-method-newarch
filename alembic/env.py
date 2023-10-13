@@ -46,6 +46,15 @@ for table_name in target_metadata.tables.keys():
     if schema_name is not None:
         break
 
+
+def include_name(name, type_, parent_names):
+    if type_ == "schema":
+        # this **will* include the default schema
+        return name in [None, schema_name]
+    else:
+        return True
+    
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -63,6 +72,7 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        compare_type=True,
         dialect_opts={"paramstyle": "named"},
     )
 
@@ -90,7 +100,8 @@ def run_migrations_online() -> None:
                 target_metadata=target_metadata,
                 version_table_schema=schema_name,
                 compare_type=True,
-                # include_schemas=True,
+                include_schemas=True,
+                include_name=include_name,
             )
             connection.execute(f'CREATE SCHEMA IF NOT EXISTS {schema_name}')
         else:
@@ -98,6 +109,8 @@ def run_migrations_online() -> None:
                 connection=connection, 
                 target_metadata=target_metadata,
                 compare_type=True,
+                include_schemas=True,
+                include_name=include_name,
             )
 
         with context.begin_transaction():
