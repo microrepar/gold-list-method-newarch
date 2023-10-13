@@ -1,3 +1,6 @@
+"""_summary_
+"""
+
 import datetime
 
 import streamlit as st
@@ -71,10 +74,10 @@ if len(notebooks_list) > 0:
         "headerToolbar": {
             "left": "today prev,next",
             "center": "title",
-            "right": "dayGridDay,dayGridWeek,dayGridMonth",
+            "right": "dayGridDay,dayGridWeek,dayGridMonth,multiMonthYear",
         },
         "initialDate": f"{datetime.datetime.now().date()}",
-        "initialView": "dayGridMonth",
+        "initialView": "multiMonthYear",
     }
 
         
