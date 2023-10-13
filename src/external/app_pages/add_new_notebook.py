@@ -71,6 +71,7 @@ if notebook_list:
     df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook_list], ignore_index=True)
     st.markdown('#### Last Resgistred Notebooks')
     st.dataframe(df.sort_values('id', ascending=False), hide_index=True, use_container_width=True)
+    st.markdown(f'Lines total: {df.shape[0]}')
 else:
     st.subheader('Notebooks')
     st.markdown(':red[Atteption! There are no registred notebooks.]')
