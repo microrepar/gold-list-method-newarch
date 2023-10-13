@@ -38,7 +38,6 @@ if submitted:
     request = {
         'resource': '/notebook/registry',
         'notebook_name': notebook_name,
-        'notebook_created_at': datetime.datetime.now().date(),
         'notebook_list_size': list_size,
         'notebook_days_period': days_period,
         'notebook_foreign_idiom': foreign_idiom,
@@ -65,10 +64,12 @@ request = {
 }
 resp = controller(request)
 
+st.divider()
+
 notebook_list = resp.get('entities')
 if notebook_list:
     df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook_list], ignore_index=True)
-    st.subheader('Notebooks')
+    st.markdown('#### Last Resgistred Notebooks')
     st.dataframe(df.sort_values('id', ascending=False), hide_index=True, use_container_width=True)
 else:
     st.subheader('Notebooks')

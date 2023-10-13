@@ -25,7 +25,6 @@ notebooks_list = resp.get('entities')
 messages = resp.get('messages')
 #############################################################
 
-
 if 'flag_alter_calendar' not in st.session_state:
     st.session_state.flag_alter_calendar = True
 
@@ -43,7 +42,7 @@ if len(notebooks_list) > 0:
 
     notebook: Notebook = notebook_dict.get(selected_notebook)
 
-    st.title(f'NOTEBOOK - {notebook.name.upper()}')
+    st.subheader(f'{notebook.name.upper()} NOTEBOOK')
 
     col_group_1, col_group_2, col_group_3, col_group_4 = st.sidebar.columns(4)
     st.sidebar.markdown("[Add New Headlist](Add%20HeadList)")
@@ -78,8 +77,7 @@ if len(notebooks_list) > 0:
         "initialView": "dayGridMonth",
     }
 
-    
-    
+        
     if st.session_state.flag_alter_calendar:
         state = calendar(
             events=events,
@@ -93,8 +91,10 @@ if len(notebooks_list) > 0:
             key=mode+'2',
         )
 
+    # TODO: find param to set calendar initialDate
     st.button('UPDATE CALENDAR', 
-              use_container_width=True, 
+              use_container_width=True,
+              on_click=on_change_notebook, 
               type='primary')
 
 else:

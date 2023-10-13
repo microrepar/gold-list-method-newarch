@@ -37,7 +37,7 @@ if not messages:
     
     notebook: Notebook = notebook_dict.get(selected_notebook)
  
-    st.title(f'NOTEBOOK - {notebook.name.upper()}')
+    st.subheader(f'{notebook.name.upper()} NOTEBOOK')
     col_group_1, col_group_2, col_group_3, col_group_4 = st.sidebar.columns(4)
 
     st.sidebar.divider()
@@ -59,13 +59,14 @@ if not messages:
 
     df_edit = pd.DataFrame(new_data_add)
 
-
     column_configuration_data = {
         "foreign_language": st.column_config.TextColumn(
-            "Foreign Language", help="The sentece or word that you want to learn"
+            "Foreign Language", help="The sentece or word that you want to learn",
+            required=True
         ),
         "mother_tongue": st.column_config.TextColumn(
-            "Mother Tongue", help="translation the sentece or word that you want to learn"
+            "Mother Tongue", help="translation the sentece or word that you want to learn",
+            required=True
         ),
     }
 
@@ -124,14 +125,14 @@ if not messages:
         # INSERT PAGESECTION - BODY REQUEST
         ###############################################################
         request = {
-            'resource': '/pagesection/registry',
-            'pagesection_notebook': {'notebook_id_': notebook.id,
-                                     'notebook_days_period': notebook.days_period},
-            'pagesection_group': Group.HEADLIST,
-            'pagesection_created_at': selected_day,
-            'pagesection_translated_sentences': df_result['translated_sentences'].to_list(),
-            'pagesection_memorializeds': df_result['remembered'].to_list(),
-            'pagesection_sentences': list(df_result.T.to_dict().values()),            
+            'resource'                         : '/pagesection/registry',
+            'pagesection_notebook'             : {'notebook_id_': notebook.id,
+            'notebook_days_period'             :   notebook.days_period},
+            'pagesection_group'                : Group.HEADLIST,
+            'pagesection_created_at'           : selected_day,
+            'pagesection_translated_sentences' : df_result['translated_sentences'].to_list(),
+            'pagesection_memorializeds'        : df_result['remembered'].to_list(),
+            'pagesection_sentences'            : list(df_result.T.to_dict().values()),
         }
 
         # FrontController
@@ -182,13 +183,15 @@ if not messages:
     col_group_3.markdown(f'**GroupC:** {qty_group_c:0>7}')
     col_group_4.markdown(f'**GroupD:** {qty_group_d:0>7}')
 
+    st.divider()
+
     if notebook.page_section_list:
         df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook.page_section_list \
                         if n.group == Group.A and n.created_at != n.distillation_at], ignore_index=True)
         df = df.groupby('created_at').first().reset_index()
         df_result = df.sort_values('created_at', ascending=False).head(5)
 
-        st.subheader('Last 5 Registred HeadLists:')
+        st.markdown('#### Last 5 Registred HeadLists:')
         st.dataframe(df_result, hide_index=True, use_container_width=True)
         st.markdown(f'Lines total: {df.shape[0]}')
     else:

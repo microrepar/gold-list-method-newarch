@@ -48,8 +48,9 @@ class PageSection(Entity):
         self.set_created_by(created_by)        # section_number from  PageSection
     
     def clone(self):
-        return self.__class__(
+        return PageSection(
             id_=None,
+            notebook=self.notebook,
             section_number=self.section_number,
             page_number=self.page_number,
             group=self.group,
@@ -60,8 +61,7 @@ class PageSection(Entity):
             distillated=self._distillated,
             sentences=self.sentences,
             translated_sentences=self.translated_sentences,
-            memorializeds=self.memorializeds,
-            notebook=self.notebook
+            memorializeds=self.memorializeds
         )
     
     @property
@@ -73,6 +73,8 @@ class PageSection(Entity):
         self._distillated = bool(value)
         if value:
             self._distillation_actual = datetime.datetime.now().date()
+        else:
+            self._distillation_actual = None
 
     def set_id(self, id_):
         self.id = id_
@@ -197,5 +199,7 @@ class PageSection(Entity):
         if self.notebook is None or self.notebook.days_period is None:
             return f'Notebook is none or it has not defined days_period attribute value.'
 
+    def set_distillation_at(self):
         self.distillation_at = (self.created_at + datetime.timedelta(days=self.notebook.days_period))
+
                 

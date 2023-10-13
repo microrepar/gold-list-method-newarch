@@ -28,8 +28,10 @@ class PageSectionRegistry(UseCase):
 
         next_page_number = self.repository.get_last_page_number(entity)
         entity.page_number = next_page_number
+        entity.set_distillation_at()
         
         result.msg = entity.validate_data()
+
         if result.qtde_msg() > 0:
             result.entidades = entity
             return result        

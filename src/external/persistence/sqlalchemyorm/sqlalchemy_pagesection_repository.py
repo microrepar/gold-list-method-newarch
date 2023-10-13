@@ -139,11 +139,49 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                     next_page_number = next_page_number + 1 if next_page_number is not None else 1
                     instance.page_number = next_page_number
                 
-                return next_page_number
+            return next_page_number
             
         except Exception as error:
             self.database.session.rollback()
             raise error
+
+    def update(self, entity: PageSection) -> PageSection:
+        try:
+            with self.database.session.begin():
+                instance: PageSectionModel = (self.database.session
+                                              .query(PageSectionModel)
+                                              .filter_by(id=entity.id)
+                                              .one_or_none())
+                if instance is None:
+                    raise Exception(f'There is no PageSection with id={entity.id}')
+                
+                if entity.created_by is not None:
+                    instance.created_by_id = entity.created_by.id
+                    inner_page_entity = (self.database.session
+                                         .query(PageSectionModel)
+                                         .filter_by(id=entity.created_by.id)
+                                         .one_or_none())
+
+                instance.distillated          = entity.distillated
+                instance.distillation_actual  = entity._distillation_actual
+                instance.memorializeds        = entity.memorializeds
+                instance.translated_sentences = entity.translated_sentences
+                
+            updated_entity = PageSectionModel.pagesection_model_to_entity(instance)
+            updated_entity.notebook = NotebookModel.notebook_model_to_entity(instance.notebook)
+            updated_entity.sentences = [SentenceModel.sentence_model_to_entity(s) for s in instance.sentences]
+            
+            if entity.created_by is not None:
+                updated_entity.created_by = PageSectionModel.pagesection_model_to_entity(inner_page_entity)
+
+            return updated_entity
+
+        except Exception as error:
+            self.database.session.rollback()
+            raise error
+        finally:
+            del entity
+            self.database.close()
 
 
     def registry(self, entity: PageSection) -> PageSection:
@@ -151,7 +189,10 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
             instance = None
             with self.database.session.begin():
 
-                has_notebook: NotebookModel = self.database.session.query(NotebookModel).filter_by(id=entity.notebook.id).one_or_none()
+                has_notebook: NotebookModel = (self.database.session
+                                               .query(NotebookModel)
+                                               .filter_by(id=entity.notebook.id)
+                                               .one_or_none())
                 if not has_notebook:
                     raise Exception(f'Notebook id={entity.notebook.id} was not found.' )
                 
@@ -186,4 +227,5 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
             self.database.session.rollback()
             raise error
         finally:
+            del entity
             self.database.close()

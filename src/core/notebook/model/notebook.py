@@ -98,7 +98,7 @@ class Notebook(Entity):
         for page_section in self.page_section_list:
             if distillation_at == page_section.distillation_at \
                     and group == page_section.group \
-                        and page_section.created_at is not None:
+                        and page_section.created_at != distillation_at:
                 return page_section
     
     def count_page_section_by_group(self, *, group):

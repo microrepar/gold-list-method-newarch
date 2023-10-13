@@ -4,7 +4,7 @@ from typing import List
 
 from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Float,
                         ForeignKey, Integer, MetaData, Sequence, String, Table,
-                        Text)
+                        Text, func)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -22,7 +22,7 @@ class NotebookModel(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(200), unique=True)
-    created_at = Column(Date, default=datetime.datetime.now)
+    created_at = Column(Date, default=func.current_date())
     updated_at = Column(Date)
     list_size = Column(Integer)
     days_period = Column(Integer)
@@ -64,6 +64,7 @@ class NotebookModel(Base):
 pagesection_sentence_assoc = Table(
     'pagesection_sentence_assoc', Base.metadata,
     Column('id', Integer, primary_key=True),
+    Column('created_at', Date, default=func.current_date()),
     Column('pagesectio_id', Integer, ForeignKey('page_section.id')),
     Column('sentence_id', Integer, ForeignKey('sentence.id'))
 )
@@ -78,17 +79,19 @@ class PageSectionModel(Base):
     id = Column(Integer, primary_key=True)
     section_number = Column(Integer)
     page_number = Column(Integer)
-    group = Column(String(1))
-    created_at = Column(Date)
+    _group = Column('group', String(2))
+    created_at = Column(Date, default=func.current_date())
     distillation_at = Column(Date)
     distillated = Column(Boolean)
     distillation_actual = Column('distillation_actual', Date)
-    created_by = Column(Integer)
     _translated_sentences = Column('translated_sentences', String)
     _memorializeds = Column('memorializeds', String)
 
     notebook_id = Column(Integer, ForeignKey('notebook.id'))
     notebook = relationship('NotebookModel', back_populates='page_section_list')
+
+    created_by_id = Column(Integer, ForeignKey('page_section.id'))
+    created_by = relationship('PageSectionModel', remote_side=[id], backref='children')
 
     sentences = relationship('SentenceModel', secondary=pagesection_sentence_assoc, back_populates='page_sections')
 
@@ -107,20 +110,27 @@ class PageSectionModel(Base):
     @memorializeds.setter
     def memorializeds(self, bool_list: List[bool]):
         self._memorializeds = json.dumps(bool_list)
+
+    @property
+    def group(self) -> Group:
+        return Group(self._group)
+    
+    @group.setter
+    def group(self, group: Group):
+        self._group = group.value
     
     @classmethod
     def pagesection_model_to_entity(cls, model: 'PageSectionModel') -> PageSection:
         entity = PageSection(
                 id_=model.id,
                 section_number=model.section_number,
-                page_number=model.page_number,                
-                created_at=model.created_at,
-                created_by=model.created_by,
+                page_number=model.page_number,
+                group=model.group,
+                created_at=model.created_at,                
                 distillation_at=model.distillation_at,
                 distillation_actual=model.distillation_actual,
                 distillated=model.distillated
         )
-        entity.group = Group(model.group)
         entity.translated_sentences = model.translated_sentences
         entity.memorializeds = model.memorializeds
 
@@ -132,9 +142,8 @@ class PageSectionModel(Base):
             id=entity.id,
             section_number=entity.section_number,
             page_number=entity.page_number,
-            group=entity.group.value,
+            group=entity.group,
             created_at=entity.created_at,
-            created_by=entity.created_by,
             distillation_at=entity.distillation_at,
             distillation_actual=entity._distillation_actual,
             distillated=entity.distillated,
@@ -153,7 +162,7 @@ class SentenceModel(Base):
     __table_args__ = {"schema": "gold_list_method"}
 
     id = Column(Integer, primary_key=True)
-    created_at = Column(Date, default=datetime.datetime.now)
+    created_at = Column(Date, default=func.current_date())
     foreign_language = Column(String)
     mother_tongue = Column(String)
     foreign_idiom = Column(String)

@@ -31,5 +31,10 @@ class PageSectionRepository(Protocol):
     def get_last_page_number(self, entity: PageSection) -> int:
         """Get next page number to PageSection
         """
+    
+    @abstractmethod
+    def update(self, entity: PageSection) -> PageSection:
+        """Update page number in database
+        """
 
     
