@@ -1,7 +1,8 @@
 import datetime
 
-from ...shared.utils import date_to_string
-from ...shared.entity import Entity
+from src.core.shared.entity import Entity
+from src.core.shared.utils import date_to_string
+
 
 class Sentence(Entity):
     def __init__(self, *,

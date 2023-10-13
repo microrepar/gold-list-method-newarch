@@ -63,11 +63,10 @@ if len(notebook_list) > 0:
                                              [n.name for n in notebook_list],
                                              key='select_notebook')
     
-    choiced_group = st.sidebar.radio('SELECT GROUP:', ('GROUP A', 'GROUP B', 'GROUP C', 'GROUP D'))
 
     notebook: Notebook = notebook_dict.get(selected_notebook)
 
-    st.subheader(f'{notebook.name.upper()} NOTEBOOK - {choiced_group}')
+    placeholder_subtitle = st.empty()
 
     col_group_1, col_group_2, col_group_3, col_group_4 = st.sidebar.columns(4)
 
@@ -75,8 +74,10 @@ if len(notebook_list) > 0:
                                          datetime.datetime.now().date(), 
                                          format='DD/MM/YYYY')
     
+    choiced_group = st.sidebar.radio('SELECT GROUP:', ('GROUP A', 'GROUP B', 'GROUP C', 'GROUP D'))
     dataframe, page_section_group = get_group_dataframe(selected_day, 
                                                         Group(choiced_group.split()[-1]))
+    placeholder_subtitle.subheader(f'{notebook.name.upper()} NOTEBOOK - {choiced_group}')
 
     st.sidebar.markdown("[Show Calendar](Calendar)")
 

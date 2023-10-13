@@ -2,10 +2,10 @@ import datetime
 from enum import Enum
 from typing import List
 
-from ...notebook import Notebook
-from ...sentence.model.sentence import Sentence
-from ...shared.entity import Entity
-from ...shared.utils import date_to_string
+from src.core.notebook import Notebook
+from src.core.sentence.model.sentence import Sentence
+from src.core.shared.entity import Entity
+from src.core.shared.utils import date_to_string
 
 
 class Group(Enum):

@@ -1,8 +1,9 @@
+from src.core import usecase_map
 from src.core.shared.application import Result
-from ...shared.usecase import UseCase
+from src.core.shared.usecase import UseCase
+
 from ..model.notebook import Notebook
 from .notebook_repository import NotebookRepository
-from src.core import usecase_map
 
 
 @usecase_map('/notebook/registry')
@@ -11,12 +12,12 @@ class NotebookRegistry(UseCase):
     def __init__(self, *, repository: NotebookRepository):
         self.repository = repository
 
-    def execute(self, notebook: Notebook) -> int:
+    def execute(self, notebook: Notebook) -> Result:
         result = Result()
         
         result.msg = notebook.validate_data()
         if result.msg:
-            result.entidades = notebook
+            result.entities = notebook
             return result
         
         try:
@@ -28,7 +29,7 @@ class NotebookRegistry(UseCase):
                 result.msg = str(error)
             return result
 
-        result.entidades = new_notebook
+        result.entities = new_notebook
         
         return result
 

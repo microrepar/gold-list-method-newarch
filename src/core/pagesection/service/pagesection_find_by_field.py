@@ -1,13 +1,8 @@
-import datetime
-from typing import Generic
-
 from src.core import usecase_map
 from src.core.shared.application import Result
+from src.core.shared.usecase import UseCase
 
-from ...notebook import Notebook
-from ...shared.application import Result
-from ...shared.usecase import UseCase
-from ..model.pagesection import Group, PageSection
+from ..model.pagesection import PageSection
 from .pagesection_repository import PageSectionRepository
 
 

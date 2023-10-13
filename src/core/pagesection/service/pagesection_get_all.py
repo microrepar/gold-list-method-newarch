@@ -1,9 +1,9 @@
-from ...shared.application import Result
+from src.core import usecase_map
+from src.core.shared.application import Result
+from src.core.shared.usecase import UseCase
 
-from ...shared.usecase import UseCase
 from ..model.pagesection import PageSection
 from .pagesection_repository import PageSectionRepository
-from ....core import usecase_map
 
 
 @usecase_map('/pagesection')
@@ -21,6 +21,6 @@ class PageSectionGetAll(UseCase):
             result.msg = f'There are no page sections into notebook.'
             return result
         
-        result.entidades = pagesection_list
+        result.entities = pagesection_list
         
         return result

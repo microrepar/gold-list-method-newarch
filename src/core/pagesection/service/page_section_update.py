@@ -1,10 +1,9 @@
-import datetime
-from ...shared.application import Result
+from src.core.shared.application import Result
+from src.core.shared.usecase import UseCase
 
-from ...shared.usecase import UseCase
-from ..model.pagesection import PageSection, Group
-from .pagesection_repository import PageSectionRepository
 from ....core import usecase_map
+from ..model.pagesection import PageSection
+from .pagesection_repository import PageSectionRepository
 
 
 @usecase_map('/pagesection/update')
@@ -19,11 +18,11 @@ class PageSectionUpdate(UseCase):
 
         try:
             updated_pagesection = self.repository.update(entity)
-            result.entidades = updated_pagesection
+            result.entities = updated_pagesection
             return result
         
         except Exception as error:
             result.msg = str(error)
-            result.entidades = entity
+            result.entities = entity
             return result        
         

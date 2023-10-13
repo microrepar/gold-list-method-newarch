@@ -1,10 +1,9 @@
-import datetime
-from ...shared.application import Result
+from src.core import usecase_map
+from src.core.shared.application import Result
+from src.core.shared.usecase import UseCase
 
-from ...shared.usecase import UseCase
-from ..model.pagesection import PageSection, Group
+from ..model.pagesection import Group, PageSection
 from .pagesection_repository import PageSectionRepository
-from ....core import usecase_map
 
 
 @usecase_map('/pagesection/registry')
@@ -14,6 +13,7 @@ class PageSectionRegistry(UseCase):
         self.repository = repository
 
     def execute(self, entity: PageSection) -> Result:
+        
         result = Result()
 
         entity_filter = PageSection(created_at=entity.created_at,
@@ -32,13 +32,13 @@ class PageSectionRegistry(UseCase):
         
         result.msg = entity.validate_data()
 
-        if result.qtde_msg() > 0:
-            result.entidades = entity
+        if result.qty_msg() > 0:
+            result.entities = entity
             return result        
 
         try:
             new_entity = self.repository.registry(entity=entity)
-            result.entidades = new_entity
+            result.entities = new_entity
 
             if entity.group == Group.A:
                 clone_entity = entity.clone()
@@ -48,7 +48,7 @@ class PageSectionRegistry(UseCase):
 
         except Exception as error:
             result.msg = str(error)
-            result.entidades = entity
+            result.entities = entity
             return result        
 
         return result

@@ -1,9 +1,10 @@
 from typing import List
 
-from ...shared import UseCase
+from src.core import usecase_map
+from src.core.shared import UseCase
+from src.core.shared.application import Result
+
 from .. import Notebook, NotebookRepository
-from ...shared.application import Result
-from ... import usecase_map
 
 
 @usecase_map('/notebook/id')
@@ -18,8 +19,8 @@ class NotebookGetById(UseCase):
 
         if not has_notebook:
             result.msg = f'There are no registred notebooks!'
-            result.entidades = notebook
+            result.entities = notebook
             return result
         
-        result.entidades = has_notebook
+        result.entities = has_notebook
         return result

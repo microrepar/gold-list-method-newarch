@@ -1,9 +1,9 @@
-from ...shared.application import Result
+from src.core import usecase_map
+from src.core.shared.application import Result
+from src.core.shared.usecase import UseCase
 
-from ...shared.usecase import UseCase
-from ..model.pagesection import PageSection, Group
+from ..model.pagesection import Group, PageSection
 from .pagesection_repository import PageSectionRepository
-from ....core import usecase_map
 
 NEXT_GROUP = {
     'A': Group.B,
@@ -38,13 +38,13 @@ class PageSectionDistillation(UseCase):
         entity.distillated = True
         result.msg = entity.validate_data()
 
-        if result.qtde_msg() > 0:
-            result.entidades = entity
+        if result.qty_msg() > 0:
+            result.entities = entity
             return result
 
         try:
             updated_pagesection = self.repository.update(entity)
-            result.entidades = updated_pagesection
+            result.entities = updated_pagesection
             
             new_entity = self.repository.registry(entity_clone)
             
@@ -52,7 +52,7 @@ class PageSectionDistillation(UseCase):
         except Exception as error:
             result.msg = str(error)
             entity.distillated = None
-            result.entidades = entity
+            result.entities = entity
             
         return result        
         

@@ -1,50 +1,56 @@
-"""Módulo aplicacao - contém as classes da aplicação
+"""application module
 """
+
 from typing import List
 from collections.abc import Sequence
 
+from .entity import Entity
 
-list_entidade = List[object]
+
+entity_list = List[Entity]
 list_str = List[str]
 
 
 class Result:
 
     def __init__(self):
-        self.__msg = list()
-        self.__entidades: list_entidade = list()
+        self._msg = list()
+        self._entities: entity_list = list()
         self.form = None
 
     @property
     def msg(self) -> list_str:
-        return self.__msg
+        return self._msg
 
     @msg.setter
-    def msg(self, mensagem: str):
-        if isinstance(mensagem, str):
-            self.__msg += list([mensagem])
-        elif isinstance(mensagem, Sequence):
-            self.__msg += list(mensagem)
+    def msg(self, message: str):
+        if isinstance(message, str):
+            self._msg += list([message])
+        elif isinstance(message, Sequence):
+            self._msg += list(message)
 
     @property
-    def entidades(self) -> list_entidade:
-        return self.__entidades
+    def entities(self) -> entity_list:
+        return self._entities
 
-    @entidades.setter
-    def entidades(self, entidade):
-        if isinstance(entidade, Sequence):
-            self.__entidades += list(entidade)
-        elif entidade is not None:
-            self.__entidades += list([entidade])
+    @entities.setter
+    def entities(self, entities: List[Entity]):
+        if isinstance(entities, Entity):
+            self._entities += list([entities])
+        elif isinstance(entities, Sequence):
+            for entity in entities:
+                if not isinstance(entity, Entity):
+                    raise Exception(f'This {entity} is not Entity.')
+            self._entities += list(entities)
 
-    def qtde_entidades(self):
-        return len(self.entidades)
+    def qty_entities(self):
+        return len(self._entities)
 
-    def qtde_msg(self):
+    def qty_msg(self):
         return len(self.msg)
     
     def to_dict(self):
         return {
-            'messages': self.__msg,
-            'entities': self.__entidades,
+            'messages': self._msg,
+            'entities': self._entities,
         }
