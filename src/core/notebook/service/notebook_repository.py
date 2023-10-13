@@ -2,12 +2,13 @@ from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
 from src.core.shared.application import Result
+from src.core.shared.repository import Repository
 
 from ..model.notebook import Notebook
 
 
 @runtime_checkable
-class NotebookRepository(Protocol):
+class NotebookRepository(Repository, Protocol):
 
     @abstractmethod
     def registry(self, entity: Notebook) -> Result :

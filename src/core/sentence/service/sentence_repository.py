@@ -1,11 +1,13 @@
 from abc import abstractmethod
 from typing import List, Protocol, runtime_checkable
 
+from src.core.shared.repository import Repository
+
 from ..model.sentence import Sentence
 
 
 @runtime_checkable
-class SentenceRepository(Protocol):
+class SentenceRepository(Repository, Protocol):
 
     @abstractmethod
     def registry(self, entity: Sentence, clone_entity: Sentence) -> None :

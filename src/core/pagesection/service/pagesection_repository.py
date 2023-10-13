@@ -2,12 +2,13 @@ from abc import abstractmethod
 from typing import Protocol, runtime_checkable
 
 from src.core.shared.application import Result
+from src.core.shared.repository import Repository
 
 from ..model.pagesection import PageSection
 
 
 @runtime_checkable
-class PageSectionRepository(Protocol):
+class PageSectionRepository(Repository, Protocol):
 
     @abstractmethod
     def registry(self, entity: PageSection) -> Result:
