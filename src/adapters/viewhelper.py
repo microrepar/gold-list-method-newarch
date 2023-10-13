@@ -63,34 +63,28 @@ class GenericViewHelper(AbstractViewHelper):
                     else:
                         kwargs[name] = param.annotation(param_value)
                 
-                elif type_mapping.get(param.annotation.__name__):
-                    inner_cls = param.annotation
-                    inner_class_name = param.annotation.__name__
-                    inner_class_param = [type_mapping.get(inner_class_name)]
-
-                    inner_value: List[Dict[str: Any]] = request.get(f'{class_name}_{name}')
-                    
+                elif getattr(param.annotation, '__base__', None) == Entity:
+                    inner_class_param = [param.annotation]
+                    inner_value: List[Dict[str: Any]] = request.get(f'{class_name}_{name}')                    
                     kwargs[name] : List[Entity] = self.get_entities(*inner_class_param, request=inner_value)[-1]
 
                 elif hasattr(param.annotation, '__origin__') \
-                        and param.annotation.__origin__ is list:
-                    
+                        and param.annotation.__origin__ is list:                    
                     if len(param.annotation.__args__) == 1 \
-                            and type_mapping.get(param.annotation.__args__[0].__name__):
+                            and getattr(param.annotation.__args__[0], '__base__', None) == Entity:
                         
                         inner_cls = param.annotation.__args__[0]
-                        inner_class_name = param.annotation.__name__
-                        inner_class_param = [inner_cls]
-                        
+                        inner_class_param = [inner_cls]                        
                         values: List[Dict[str: Any]] = request.get(f'{class_name}_{name}')
+
                         if values:
                             attr_list = []
                             for inner_value in values:
                                 attr_list.append(
                                     self.get_entities(*inner_class_param, request=inner_value)[-1]
-                                )
-                
+                                )                
                             kwargs[name] = attr_list
+
                     else:
                         kwargs[name] = param_value
              

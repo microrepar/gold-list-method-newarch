@@ -2,12 +2,12 @@ import inspect
 import os
 from typing import Dict, List
 
-from ..core.shared.usecase import UseCase
+from src.core.shared.usecase import UseCase
 
-from ..core import usecases
-from ..core.shared.application import Result
-from ..core.shared.entity import Entity
-from ..external.persistence import repositories
+from src.core import usecases
+from src.core.shared.application import Result
+from src.core.shared.entity import Entity
+from src.external.persistence import repositories
 from .viewhelper import GenericViewHelper
 
 
@@ -39,7 +39,7 @@ class Controller:
         # Generates a list of repositories, from the type annotations in the method signature, 
         # __init__ from the UseCase to retrieve the repository name
         repository_classes = [param.annotation for _, param in repository_signatures.parameters.items() \
-                   if param.annotation is not inspect.Parameter.empty and inspect.isclass(param.annotation)]
+                   if param.annotation is not inspect.Parameter.empty]
 
         # Retrieves the class name from the repository that was defined in the __init__ param from the usecase
         if not repository_classes:
@@ -57,7 +57,7 @@ class Controller:
         # Generate a list of entities, from the type annotations in the controller signature, 
         # to use in the generic viewhelper
         entity_classes = [param.annotation for _, param in entity_signatures.parameters.items() \
-                   if param.annotation is not inspect.Parameter.empty and inspect.isclass(param.annotation)]
+                   if getattr(param.annotation, '__base__', None) == Entity]
 
         # Passes the request and the list of entities that the controller requires to the generic viewhelper. 
         # Attempts to create the objects requested in the controller parameter.
