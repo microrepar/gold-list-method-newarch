@@ -62,10 +62,12 @@ if len(notebook_list) > 0:
     selected_notebook = st.sidebar.selectbox('**SELECT NOTEBOOK:**', 
                                              [n.name for n in notebook_list],
                                              key='select_notebook')
+    
+    choiced_group = st.sidebar.radio('SELECT GROUP:', ('GROUP A', 'GROUP B', 'GROUP C', 'GROUP D'))
 
     notebook: Notebook = notebook_dict.get(selected_notebook)
 
-    st.subheader(f'{notebook.name.upper()} NOTEBOOK')
+    st.subheader(f'{notebook.name.upper()} NOTEBOOK - {choiced_group}')
 
     col_group_1, col_group_2, col_group_3, col_group_4 = st.sidebar.columns(4)
 
@@ -73,7 +75,6 @@ if len(notebook_list) > 0:
                                          datetime.datetime.now().date(), 
                                          format='DD/MM/YYYY')
     
-    choiced_group = st.sidebar.radio('SELECT GROUP:', ('GROUP A', 'GROUP B', 'GROUP C', 'GROUP D'))
     dataframe, page_section_group = get_group_dataframe(selected_day, 
                                                         Group(choiced_group.split()[-1]))
 
