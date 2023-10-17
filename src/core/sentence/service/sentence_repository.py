@@ -10,16 +10,21 @@ from ..model.sentence import Sentence
 class SentenceRepository(Repository, Protocol):
 
     @abstractmethod
-    def registry(self, entity: Sentence, clone_entity: Sentence) -> None :
+    def registry(self, entity: Sentence, clone_entity: Sentence) -> Sentence :
         """Registry a Sentence into database 
         """
 
     @abstractmethod
     def get_all(self, entity: Sentence = None) -> List[Sentence]:
-        """Get all registred Sentences in database
+        """Get all registred Sentences in the database
         """
 
     @abstractmethod
     def get_by_id(self, entity: Sentence) -> Sentence:
-        """Get by id a registred Sentence in database
+        """Get by id a registred Sentence in the database
+        """
+    
+    @abstractmethod
+    def find_by_field(self, entity: Sentence) -> Sentence:
+        """Get by id a registred Sentence in the database
         """

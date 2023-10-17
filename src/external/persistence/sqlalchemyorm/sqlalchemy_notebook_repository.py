@@ -146,7 +146,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             self.database.close()         
 
 
-    def registry(self, entity: Notebook) -> None:
+    def registry(self, entity: Notebook) -> Notebook:
         instance = NotebookModel.notebook_entity_to_model(entity)
         try:
             with self.database.session.begin():                

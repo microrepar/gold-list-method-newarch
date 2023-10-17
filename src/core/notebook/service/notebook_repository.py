@@ -1,7 +1,6 @@
 from abc import abstractmethod
-from typing import Protocol, runtime_checkable
+from typing import List, Protocol, runtime_checkable
 
-from src.core.shared.application import Result
 from src.core.shared.repository import Repository
 
 from ..model.notebook import Notebook
@@ -11,21 +10,21 @@ from ..model.notebook import Notebook
 class NotebookRepository(Repository, Protocol):
 
     @abstractmethod
-    def registry(self, entity: Notebook) -> Result :
+    def registry(self, entity: Notebook) -> Notebook:
         """Registry a notebook into database
         """
 
     @abstractmethod
-    def get_all(self, entity: Notebook = None) -> Result:
+    def get_all(self, entity: Notebook = None) -> List[Notebook]:
         """Get all registred notebooks in database
         """
     
     @abstractmethod
-    def get_by_id(self, entity: Notebook) -> Result:
+    def get_by_id(self, entity: Notebook) -> Notebook:
         """Get by id registred notebooks in database
         """
     
     @abstractmethod
-    def find_by_field(self, entity: Notebook) -> Result:
+    def find_by_field(self, entity: Notebook) -> List[Notebook]:
         """Find by id registred notebooks in database
         """
