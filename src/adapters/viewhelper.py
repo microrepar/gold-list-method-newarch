@@ -3,23 +3,14 @@
 import abc
 from collections import OrderedDict
 import datetime
+from enum import Enum
 import inspect
 from typing import Any, Dict, List
 
-from ..core.shared.application import Result
-from ..core.shared.entity import Entity
-from ..core.notebook import Notebook
-from ..core.pagesection import PageSection, Group
-from ..core.sentence import Sentence
+from src.core.shared.application import Result
+from src.core.shared.entity import Entity
 
-
-type_mapping = {
-    Notebook.__name__: Notebook,
-    PageSection.__name__: PageSection,
-    Sentence.__name__: Sentence,
-}
-
-primitive_types = (int, float, str, bool, bytes, datetime.date, dict, set, Group)
+primitive_types = [int, float, str, bool, bytes, datetime.date, dict, set] + Enum.__subclasses__()
 
 class AbstractViewHelper(abc.ABC):
     @abc.abstractmethod
