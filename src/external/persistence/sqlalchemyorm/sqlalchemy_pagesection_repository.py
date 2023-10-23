@@ -8,7 +8,7 @@ from src.core.notebook import Notebook
 from src.core.sentence import Sentence
 
 from ...persistence import repository_map
-from .model.base import NotebookModel, PageSectionModel, SentenceModel
+from .model.base import NotebookModel, PageSectionModel, SentenceModel, pagesection_sentence_assoc
 from .settings.connection import DBConnectionHandler
 
 
@@ -79,10 +79,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                 attr = 'notebook_id'
                 value = int(value.id)
             elif isinstance(value, Group):
+                attr = '_group'
                 value = value.value            
             elif isinstance(value, PageSection):
-                attr = 'created_at'
-                value = value.created_by.created_at
+                attr = 'created_by_id'
+                value = value.created_by.id
             elif attr in 'created_at':
                 if isinstance(value, datetime.date):
                     value = value
@@ -99,8 +100,7 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         try:
             with self.database.session.begin():
                     
-                instance_page_list = (self.database.session.query(PageSectionModel)
-                                    .filter_by(**kwargs).all())
+                instance_page_list = self.database.session.query(PageSectionModel).filter_by(**kwargs).all()
 
                 entity_page_list = []
                         
@@ -167,6 +167,13 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                 instance.memorializeds        = entity.memorializeds
                 instance.translated_sentences = entity.translated_sentences
                 
+                for index, sentence in enumerate(instance.sentences):
+                    self.database.session.query(pagesection_sentence_assoc).filter(
+                        pagesection_sentence_assoc.c.pagesection_id == instance.id,
+                        pagesection_sentence_assoc.c.sentence_id == sentence.id
+                    ).update({'memorialized': entity.memorializeds[index],
+                              'distillated': entity.distillated,})
+
             updated_entity = PageSectionModel.pagesection_model_to_entity(instance)
             updated_entity.notebook = NotebookModel.notebook_model_to_entity(instance.notebook)
             updated_entity.sentences = [SentenceModel.sentence_model_to_entity(s) for s in instance.sentences]
@@ -194,6 +201,7 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                                                .filter_by(id=entity.notebook.id)
                                                .one_or_none())
                 if not has_notebook:
+                    self.database.session.rollback()
                     raise Exception(f'Notebook id={entity.notebook.id} was not found.' )
                 
                 instance: PageSectionModel = PageSectionModel.pagesection_entity_to_model(entity)
@@ -206,7 +214,23 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                                     .filter_by(foreign_language=sentence.foreign_language)
                                     .first())
                     if has_sentence:
-                        instance.sentences.append(has_sentence)
+                        is_memorialized_sentence = self.database.session.query(pagesection_sentence_assoc).filter(
+                            pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
+                            pagesection_sentence_assoc.c.memorialized == True
+                        ).first()
+                        
+                        exists_sentence_in_headlist = self.database.session.query(pagesection_sentence_assoc).filter(
+                            pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
+                            pagesection_sentence_assoc.c.group == Group.A.value,
+                            pagesection_sentence_assoc.c.page != instance.page_number
+                        ).first()
+
+                        if is_memorialized_sentence:                            
+                            raise Exception(f'This Sentece: "{has_sentence.foreign_language}" was already memorialized in page={is_memorialized_sentence.page}.')
+                        if exists_sentence_in_headlist:
+                            raise Exception(f'This Sentece: "{has_sentence.foreign_language}" already exists in page={exists_sentence_in_headlist.page}.')
+                        else:
+                            instance.sentences.append(has_sentence)
                     else:
                         instance.sentences.append(
                             SentenceModel.sentence_entity_to_model(sentence)
@@ -215,7 +239,14 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                 instance.notebook_id = has_notebook.id
                 has_notebook.page_section_list.append(instance)
                 self.database.session.add(instance)
-                
+
+                group_value = instance._group
+                for sentence in instance.sentences:
+                    self.database.session.query(pagesection_sentence_assoc).filter(
+                        pagesection_sentence_assoc.c.pagesection_id == instance.id,
+                        pagesection_sentence_assoc.c.sentence_id == sentence.id
+                    ).update({'group': group_value,
+                              'page': instance.page_number})
 
             new_entity = PageSectionModel.pagesection_model_to_entity(instance)
             new_entity.notebook = NotebookModel.notebook_model_to_entity(has_notebook)

@@ -37,16 +37,17 @@ class PageSectionRegistry(UseCase):
             return result        
 
         try:
-            new_entity = self.repository.registry(entity=entity)
-            result.entities = new_entity
-
             if entity.group == Group.A:
                 clone_entity = entity.clone()
                 clone_entity.distillation_at = entity.created_at
                 clone_entity.distillated = True
                 self.repository.registry(entity=clone_entity)
 
+            new_entity = self.repository.registry(entity=entity)
+            result.entities = new_entity
+
         except Exception as error:
+            # TODO: remove registred entities
             result.msg = str(error)
             result.entities = entity
             return result        

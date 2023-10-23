@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 
 import pandas as pd
@@ -10,8 +11,9 @@ from src.core.pagesection import Group
 
 st.set_page_config(layout='wide')
 
-placeholder_container_msg = st.container()
-placeholder_container_msg.empty()
+
+placeholder_empty_msg = st.empty()
+
 
 # Either this or add_indentation() MUST be called on each page in your
 # app to add indendation in the sidebar
@@ -48,8 +50,46 @@ if not messages:
     selected_page_section_day = page_section_dict.get(selected_day)
 
     sentences_txt = [("I love learning new languages.", "Eu adoro aprender novos idiomas."), ("She enjoys reading books in her free time.", "Ela gosta de ler livros nas horas vagas."), ("They went to the beach last weekend.", "Eles foram à praia no fim de semana passado."), ("I'm going to the grocery store to buy some groceries.", "Vou à mercearia comprar mantimentos."), ("He is a talented musician who plays the guitar beautifully.", "Ele é um músico talentoso que toca violão lindamente."), ("She usually takes a walk in the park after dinner.", "Normalmente, ela dá uma caminhada no parque depois do jantar."), ("I can't wait to see you again.", "Mal posso esperar para te ver de novo."), ("My favorite movie is a classic from the 80s.", "Meu filme favorito é um clássico dos anos 80."), ("They are planning a family vacation to Europe next summer.", "Eles estão planejando uma viagem em família para a Europa no próximo verão."), ("The weather is very hot today.", "O clima está muito quente hoje."), ("I need to study for my exams this weekend.", "Preciso estudar para as provas neste fim de semana."), ("She's a great cook and makes delicious meals.", "Ela é uma ótima cozinheira e faz refeições deliciosas."), ("He's always telling funny jokes that make everyone laugh.", "Ele está sempre contando piadas engraçadas que fazem todos rirem."), ("I enjoy going for a run in the morning.", "Gosto de sair para correr de manhã."), ("They are planning a surprise party for her birthday.", "Eles estão planejando uma festa surpresa para o aniversário dela."), ("She wants to travel the world and explore different cultures.", "Ela quer viajar pelo mundo e explorar diferentes culturas."), ("I have a lot of work to do this week.", "Tenho muito trabalho para fazer esta semana."), ("We had a great time at the concert last night.", "Nos divertimos muito no show de ontem à noite."), ("He's an excellent student and always gets good grades.", "Ele é um ótimo aluno e sempre tira boas notas."), ("They are going to visit their grandparents during the holidays.", "Eles vão visitar os avós durante as férias.")]
-    new_data_add = []
+    new_data_add = []    
+
+    if selected_page_section_day is None:
+        #############################################################
+        request = {
+            'resource': 'pagesection/get_sentences_by_group',
+            'pagesection_group': Group.NEW_PAGE,
+            'pagesection_notebook': {'notebook_id_': notebook.id},
+        }
+
+        resp = controller(request=request)
+        sentence_list = resp.get('entities')
+        messages = resp.get('messages')
+
+        if messages:
+            with placeholder_empty_msg.container():                    
+                for msg in messages:
+                    st.info(msg, icon="ℹ️")            
+        elif sentence_list:
+            placeholder_empty_msg.info(f'{len(sentence_list)} sentences were added to table bellow and are free to compose a new headlist.', icon="ℹ️")
+
+        #############################################################
+        
     for i in range(1, notebook.list_size + 1 ):
+        
+        # sentence_foregin_str = ''
+        # sentence_mother_str = ''
+
+        # with contextlib.suppress(Exception):
+        #     sentence_foregin_str = sentence_list[i-1].foreign_language
+        #     sentence_mother_str = sentence_list[i-1].mother_tongue
+                
+                    
+        # new_data_add.append(
+        #     {
+        #         "foreign_language": sentence_foregin_str,
+        #         "mother_tongue": sentence_mother_str
+        #     }
+        # )
+
         new_data_add.append(
             {
                 "foreign_language": sentences_txt[i-1][0],
@@ -142,12 +182,15 @@ if not messages:
 
         # FeedBack
         if messages:
-            for msg in messages:
-                placeholder_container_msg.error(msg,  icon="🚨")
-                st.toast('Something went wrong!')
+            with placeholder_empty_msg.container():                    
+                for msg in messages:
+                    st.error(msg, icon="🚨")
+
+            st.toast('Something went wrong!')
         elif entities:
             notebook.page_section_list.extend(entities)
             placeholder_sentences_sheet.success(f'{entities[-1]} was inserted successfully!')
+            placeholder_empty_msg.success(f'{entities[-1]} was inserted successfully!')
             placehold_btn_insert.empty()
             st.toast('Page section was inserted successfully.')
 
@@ -165,9 +208,10 @@ if not messages:
 
         # # FeedBack
         # if messages:
-        #     for msg in messages:
-        #         placeholder_container_msg.error(msg,  icon="🚨")
-        #         st.toast('Something went wrong!')
+        #    with placeholder_empty_msg.container():                    
+                # for msg in messages:
+                #     st.error(msg, icon="🚨")
+    #         st.toast('Something went wrong!')
         # else:
         #     notebook = entities[-1]        
 

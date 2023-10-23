@@ -196,8 +196,20 @@ class PageSection(Entity):
         }
 
     def validate_data(self):
+        messages = []
         if self.notebook is None or self.notebook.days_period is None:
-            return f'Notebook is none or it has not defined days_period attribute value.'
+            messages.append(f'Notebook is none or it has not defined days_period attribute value.')
+        
+        empty_sentences = 0
+        for sentence in self.sentences:
+            if sentence.foreign_language.strip() == '' or sentence.mother_tongue.strip() == '':
+                empty_sentences += 1
+        
+        if empty_sentences > 0:
+            messages.append('There is one or more empty fields to the headlist. Fill the gap and try again.')
+
+        if messages:
+            return messages
 
     def set_distillation_at(self):
         self.distillation_at = (self.created_at + datetime.timedelta(days=self.notebook.days_period))

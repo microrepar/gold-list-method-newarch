@@ -4,10 +4,12 @@
         "adapters": "pipe",
         "external": "tools",
         "pages": "rules",
-        "user": "admin",        
+        "user": "admin",
+        "persistence": "database",
+        "app_pages": "app"       
     },
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
+    // "python.linting.enabled": true,
+    // "python.linting.pylintEnabled": true,
     "files.exclude": {
         "**/*.pyc": {"when": "$(basename).py"},
         "**/__pycache__": true,

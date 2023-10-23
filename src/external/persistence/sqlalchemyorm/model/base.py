@@ -65,8 +65,12 @@ pagesection_sentence_assoc = Table(
     'pagesection_sentence_assoc', Base.metadata,
     Column('id', Integer, primary_key=True),
     Column('created_at', Date, default=func.current_date()),
-    Column('pagesectio_id', Integer, ForeignKey('page_section.id')),
-    Column('sentence_id', Integer, ForeignKey('sentence.id'))
+    Column('pagesection_id', Integer, ForeignKey('page_section.id')),
+    Column('sentence_id', Integer, ForeignKey('sentence.id')),
+    Column('page', Integer),
+    Column('group', String(2)),
+    Column('memorialized', Boolean, default=False),
+    Column('distillated', Boolean, default=False)
 )
 
 ##############################################################################
@@ -93,7 +97,7 @@ class PageSectionModel(Base):
     created_by_id = Column(Integer, ForeignKey('page_section.id'))
     created_by = relationship('PageSectionModel', remote_side=[id], backref='children')
 
-    sentences = relationship('SentenceModel', secondary=pagesection_sentence_assoc, back_populates='page_sections')
+    sentences = relationship('SentenceModel', secondary=pagesection_sentence_assoc, back_populates='page_sections', viewonly=False)
 
     @property
     def translated_sentences(self) -> List[bool]:

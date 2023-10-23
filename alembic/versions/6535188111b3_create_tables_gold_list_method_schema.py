@@ -1,8 +1,8 @@
-"""create tables
+"""create tables gold_list_method schema
 
-Revision ID: df09e5c9c6e9
+Revision ID: 6535188111b3
 Revises: 
-Create Date: 2023-10-12 14:51:31.293328
+Create Date: 2023-10-23 17:17:18.213705
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'df09e5c9c6e9'
+revision: str = '6535188111b3'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,7 +47,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('section_number', sa.Integer(), nullable=True),
     sa.Column('page_number', sa.Integer(), nullable=True),
-    sa.Column('group', sa.String(length=1), nullable=True),
+    sa.Column('group', sa.String(length=2), nullable=True),
     sa.Column('created_at', sa.Date(), nullable=True),
     sa.Column('distillation_at', sa.Date(), nullable=True),
     sa.Column('distillated', sa.Boolean(), nullable=True),
@@ -64,9 +64,13 @@ def upgrade() -> None:
     op.create_table('pagesection_sentence_assoc',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.Date(), nullable=True),
-    sa.Column('pagesectio_id', sa.Integer(), nullable=True),
+    sa.Column('pagesection_id', sa.Integer(), nullable=True),
     sa.Column('sentence_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['pagesectio_id'], ['gold_list_method.page_section.id'], ),
+    sa.Column('page', sa.Integer(), nullable=True),
+    sa.Column('group', sa.String(length=2), nullable=True),
+    sa.Column('memorialized', sa.Boolean(), nullable=True),
+    sa.Column('distillated', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['pagesection_id'], ['gold_list_method.page_section.id'], ),
     sa.ForeignKeyConstraint(['sentence_id'], ['gold_list_method.sentence.id'], ),
     sa.PrimaryKeyConstraint('id'),
     schema='gold_list_method'
