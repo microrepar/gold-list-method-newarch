@@ -206,7 +206,7 @@ class PageSection(Entity):
                 empty_sentences += 1
         
         if empty_sentences > 0:
-            messages.append('There is one or more empty fields to the headlist. Fill the gap and try again.')
+            messages.append('There is one or more empty fields to headlist. Fill the gaps and try again.')
 
         if messages:
             return messages

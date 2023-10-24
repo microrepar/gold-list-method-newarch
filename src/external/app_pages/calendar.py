@@ -77,7 +77,7 @@ if len(notebooks_list) > 0:
             "right": "dayGridDay,dayGridWeek,dayGridMonth,multiMonthYear",
         },
         "initialDate": f"{datetime.datetime.now().date()}",
-        "initialView": "multiMonthYear",
+        "initialView": "dayGridMonth",
     }
 
         

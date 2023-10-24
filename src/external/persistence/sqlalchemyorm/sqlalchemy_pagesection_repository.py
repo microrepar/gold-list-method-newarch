@@ -231,6 +231,7 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                             raise Exception(f'This Sentece: "{has_sentence.foreign_language}" already exists in page={exists_sentence_in_headlist.page}.')
                         else:
                             instance.sentences.append(has_sentence)
+
                     else:
                         instance.sentences.append(
                             SentenceModel.sentence_entity_to_model(sentence)
