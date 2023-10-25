@@ -15,10 +15,30 @@ class Sentence(Entity):
                  ):
         self.id               = id_
         self.created_at       = created_at
-        self.foreign_language = foreign_language
-        self.mother_tongue    = mother_tongue
         self.foreign_idiom    = foreign_idiom
         self.mother_idiom     = mother_idiom
+        self.foreign_language = foreign_language
+        self.mother_tongue = mother_tongue
+
+    @property
+    def foreign_language(self):
+        return self._foreign_language
+    
+    @foreign_language.setter
+    def foreign_language(self, value):
+        if value:
+            value = value.strip().split()
+            self._foreign_language = ' '.join(value)
+        
+    @property
+    def mother_tongue(self):
+        return self._mother_tongue
+    
+    @mother_tongue.setter
+    def mother_tongue(self, value):
+        if value:
+            value = value.strip().split()
+            self._mother_tongue = ' '.join(value)
     
     def data_to_dataframe(self):
         return [

@@ -35,6 +35,11 @@ class PageSectionRepository(Repository, Protocol):
         """
     
     @abstractmethod
+    def get_sentences_by_group(self, entity: 'Sentence') -> List['Sentence']:
+        """Get sentences by group
+        """
+    
+    @abstractmethod
     def update(self, entity: PageSection) -> PageSection:
         """Update page number in database
         """

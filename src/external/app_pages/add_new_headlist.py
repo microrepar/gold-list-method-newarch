@@ -53,7 +53,7 @@ if not messages:
 
     if selected_page_section_day is None:
         #############################################################
-        ### FIND BY GROUP NP
+        ### FIND SENTENCES BY NP GROUP
         #############################################################
         request = {
             'resource': 'pagesection/get_sentences_by_group',
@@ -73,8 +73,6 @@ if not messages:
             placeholder_empty_msg.info(f'{len(sentence_list)} sentences were added to table bellow and are free to compose a new headlist.', icon="ℹ️")
         #############################################################
 
-        
-    # sentences_txt = [("I love learning new languages.", "Eu adoro aprender novos idiomas."), ("She enjoys reading books in her free time.", "Ela gosta de ler livros nas horas vagas."), ("They went to the beach last weekend.", "Eles foram à praia no fim de semana passado."), ("I'm going to the grocery store to buy some groceries.", "Vou à mercearia comprar mantimentos."), ("He is a talented musician who plays the guitar beautifully.", "Ele é um músico talentoso que toca violão lindamente."), ("She usually takes a walk in the park after dinner.", "Normalmente, ela dá uma caminhada no parque depois do jantar."), ("I can't wait to see you again.", "Mal posso esperar para te ver de novo."), ("My favorite movie is a classic from the 80s.", "Meu filme favorito é um clássico dos anos 80."), ("They are planning a family vacation to Europe next summer.", "Eles estão planejando uma viagem em família para a Europa no próximo verão."), ("The weather is very hot today.", "O clima está muito quente hoje."), ("I need to study for my exams this weekend.", "Preciso estudar para as provas neste fim de semana."), ("She's a great cook and makes delicious meals.", "Ela é uma ótima cozinheira e faz refeições deliciosas."), ("He's always telling funny jokes that make everyone laugh.", "Ele está sempre contando piadas engraçadas que fazem todos rirem."), ("I enjoy going for a run in the morning.", "Gosto de sair para correr de manhã."), ("They are planning a surprise party for her birthday.", "Eles estão planejando uma festa surpresa para o aniversário dela."), ("She wants to travel the world and explore different cultures.", "Ela quer viajar pelo mundo e explorar diferentes culturas."), ("I have a lot of work to do this week.", "Tenho muito trabalho para fazer esta semana."), ("We had a great time at the concert last night.", "Nos divertimos muito no show de ontem à noite."), ("He's an excellent student and always gets good grades.", "Ele é um ótimo aluno e sempre tira boas notas."), ("They are going to visit their grandparents during the holidays.", "Eles vão visitar os avós durante as férias.")]
     for i in range(1, notebook.list_size + 1 ):
         
         sentence_foregin_str = ''
@@ -91,13 +89,6 @@ if not messages:
                 "mother_tongue": sentence_mother_str
             }
         )
-
-        # new_data_add.append(
-        #     {
-        #         "foreign_language": sentences_txt[i-1][0],
-        #         "mother_tongue": sentences_txt[i-1][1],
-        #     }
-        # )
 
     df_edit = pd.DataFrame(new_data_add)
 

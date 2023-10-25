@@ -16,11 +16,8 @@ class GetSentencesByGroup(UseCase):
         result = Result()
 
         try:
-            pagesection_list = self.repository.find_by_field(entity=entity)
-            sentence_list = []
-            for page in pagesection_list:
-                sentence_list.extend(page.sentences)
-
+            sentence_list = self.repository.get_sentences_by_group(entity=entity)
+            
             if len(sentence_list) < 1:
                 result.msg = 'There are no sentences to insert automaticly'
             

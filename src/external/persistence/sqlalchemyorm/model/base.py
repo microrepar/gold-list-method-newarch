@@ -70,7 +70,8 @@ pagesection_sentence_assoc = Table(
     Column('page', Integer),
     Column('group', String(2)),
     Column('memorialized', Boolean, default=False),
-    Column('distillated', Boolean, default=False)
+    Column('distillated', Boolean, default=False),
+    Column('notebook_id', Integer)
 )
 
 ##############################################################################

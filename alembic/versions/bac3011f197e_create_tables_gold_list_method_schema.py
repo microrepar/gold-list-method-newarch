@@ -1,8 +1,8 @@
 """create tables gold_list_method schema
 
-Revision ID: 6535188111b3
+Revision ID: bac3011f197e
 Revises: 
-Create Date: 2023-10-23 17:17:18.213705
+Create Date: 2023-10-25 12:12:06.303504
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6535188111b3'
+revision: str = 'bac3011f197e'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -70,6 +70,7 @@ def upgrade() -> None:
     sa.Column('group', sa.String(length=2), nullable=True),
     sa.Column('memorialized', sa.Boolean(), nullable=True),
     sa.Column('distillated', sa.Boolean(), nullable=True),
+    sa.Column('notebook_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['pagesection_id'], ['gold_list_method.page_section.id'], ),
     sa.ForeignKeyConstraint(['sentence_id'], ['gold_list_method.sentence.id'], ),
     sa.PrimaryKeyConstraint('id'),
