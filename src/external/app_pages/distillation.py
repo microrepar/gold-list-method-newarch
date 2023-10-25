@@ -15,10 +15,7 @@ placeholder_container_msg = st.container()
 
 add_page_title()  # Optional method to add title and icon to current page
 
-def get_group_dataframe(selected_day, group: Group):
-
-    pagesection = notebook.get_page_section(distillation_at=selected_day,
-                                            group=group)
+def get_group_dataframe(pagesection):    
 
     sentences  = None if pagesection is None else pagesection.sentences
     
@@ -73,10 +70,40 @@ if len(notebook_list) > 0:
     selected_day = st.sidebar.date_input('**LIST OF THE DAY:**', 
                                          datetime.datetime.now().date(), 
                                          format='DD/MM/YYYY')
+
+    pagesection_a = notebook.get_page_section(distillation_at=selected_day,
+                                              group=Group.A)
+    pagesection_b = notebook.get_page_section(distillation_at=selected_day,
+                                              group=Group.B)
+    pagesection_c = notebook.get_page_section(distillation_at=selected_day,
+                                              group=Group.C)
+    pagesection_d = notebook.get_page_section(distillation_at=selected_day,
+                                              group=Group.D)
     
-    choiced_group = st.sidebar.radio('SELECT GROUP:', ('GROUP A', 'GROUP B', 'GROUP C', 'GROUP D'))
-    dataframe, page_section_group = get_group_dataframe(selected_day, 
-                                                        Group(choiced_group.split()[-1]))
+    def get_btn_label(pagesection: PageSection):
+        if pagesection is None:
+            return "⚠️"
+        elif pagesection.distillated:
+            return "✅"
+        else:
+            return "🟩"
+
+    choiced_group = st.sidebar.radio('SELECT GROUP:', 
+        (
+            f'GROUP A - {get_btn_label(pagesection_a)}',
+            f'GROUP B - {get_btn_label(pagesection_b)}',
+            f'GROUP C - {get_btn_label(pagesection_c)}',
+            f'GROUP D - {get_btn_label(pagesection_d)}'
+        )
+    )
+    
+    dataframe, page_section_group = get_group_dataframe({
+        'GROUP A': pagesection_a,
+        'GROUP B': pagesection_b,
+        'GROUP C': pagesection_c,
+        'GROUP D': pagesection_d,
+    }.get(choiced_group.split(' - ')[0]))
+
     placeholder_subtitle.subheader(f'{notebook.name.upper()} NOTEBOOK - {choiced_group}')
 
     st.sidebar.markdown("[Show Calendar](Calendar)")
