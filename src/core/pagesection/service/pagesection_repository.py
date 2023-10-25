@@ -43,5 +43,15 @@ class PageSectionRepository(Repository, Protocol):
     def update(self, entity: PageSection) -> PageSection:
         """Update page number in database
         """
+    
+    @abstractmethod
+    def validate_sentences(self, entity: PageSection) -> List[str]:
+        """Validate registred sentences 
+        """
+    
+    @abstractmethod
+    def remove(self, entity: PageSection):
+        """Remove PageSection by id 
+        """
 
     

@@ -203,12 +203,95 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                 results = (self.database.session.query(SentenceModel)
                            .filter(SentenceModel.id.in_(id_list))
                            .all())
-            
+
             sentence_list = [SentenceModel.sentence_model_to_entity(m) for m in results]
 
             return sentence_list
 
         except Exception as error:            
+            self.database.session.rollback()
+            raise error
+
+    def validate_sentences(self, entity: PageSection) -> List[str]:
+        messages = []
+        try:
+            with self.database.session.begin():
+                has_notebook: NotebookModel = (self.database.session
+                                               .query(NotebookModel)
+                                               .filter_by(id=entity.notebook.id)
+                                               .one_or_none())
+                if not has_notebook:
+                    self.database.session.rollback()
+                    raise Exception(f'Notebook id={entity.notebook.id} was not found.' )
+
+                for sentence in entity.sentences:
+                    has_sentence = (self.database.session.query(SentenceModel)
+                                    .filter_by(foreign_language=sentence.foreign_language)
+                                    .first())
+                    if has_sentence:
+                        is_memorialized_sentence = self.database.session.query(pagesection_sentence_assoc).filter(
+                            pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
+                            pagesection_sentence_assoc.c.memorialized == True,
+                            pagesection_sentence_assoc.c.notebook_id == has_notebook.id
+                        ).first()
+                        
+                        exists_sentence_in_headlist = self.database.session.query(pagesection_sentence_assoc).filter(
+                            pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
+                            pagesection_sentence_assoc.c.group == Group.A.value,
+                            pagesection_sentence_assoc.c.distillated == False,
+                            pagesection_sentence_assoc.c.notebook_id == has_notebook.id
+                        ).first()
+
+                        if is_memorialized_sentence:                            
+                            messages.append(f'This Sentence "{has_sentence.foreign_language}" '
+                                            f'was already memorialized in page={is_memorialized_sentence.page} '
+                                            f'and group={is_memorialized_sentence.group}.')
+                        
+                        if exists_sentence_in_headlist:
+                            messages.append(f'This Sentece "{has_sentence.foreign_language}" '
+                                            f'already exists in page={exists_sentence_in_headlist.page} '
+                                            f'and group={exists_sentence_in_headlist.group}.')
+
+                if messages:
+                    messages = ["SentenceValidationError: One or more sentences were not validated"] + messages
+                    return '\n\n'.join(messages)
+                
+                return messages
+
+        except Exception as error:
+            self.database.session.rollback()
+            raise error
+
+    def remove(self, entity: PageSection):
+
+        if entity.id is None:
+            return
+
+        try:
+            instance = None
+            with self.database.session.begin():
+                has_notebook: NotebookModel = (self.database.session
+                                               .query(NotebookModel)
+                                               .filter_by(id=entity.notebook.id)
+                                               .one_or_none())
+                if not has_notebook:
+                    self.database.session.rollback()
+                    raise Exception(f'Notebook id={entity.notebook.id} was not found to remove page_section.' )
+                
+                instance: PageSectionModel = PageSectionModel.pagesection_entity_to_model(entity)
+
+                for sentence in instance.sentences:
+                    self.database.session.execute(pagesection_sentence_assoc
+                        .delete()
+                        .where(
+                            pagesection_sentence_assoc.c.sentence_id == sentence.id,
+                            pagesection_sentence_assoc.c.pagesection_id == instance.id
+                        )
+                    )    
+
+                self.database.session.delete(instance)
+
+        except Exception as error:
             self.database.session.rollback()
             raise error
 
@@ -235,35 +318,13 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
                                     .filter_by(foreign_language=sentence.foreign_language)
                                     .first())
                     if has_sentence:
-                        is_memorialized_sentence = self.database.session.query(pagesection_sentence_assoc).filter(
-                            pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
-                            pagesection_sentence_assoc.c.memorialized == True,
-                            pagesection_sentence_assoc.c.notebook_id == has_notebook.id
-                        ).first()
                         
-                        exists_sentence_in_headlist = self.database.session.query(pagesection_sentence_assoc).filter(
+                        instance.sentences.append(has_sentence)
+
+                        self.database.session.query(pagesection_sentence_assoc).filter(
                             pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
-                            pagesection_sentence_assoc.c.group == Group.A.value,
-                            pagesection_sentence_assoc.c.distillated == False,
-                            pagesection_sentence_assoc.c.notebook_id == has_notebook.id
-                        ).first()
-
-                        if is_memorialized_sentence:                            
-                            raise Exception(f'This Sentece: "{has_sentence.foreign_language}" '
-                                            f'was already memorialized in page={is_memorialized_sentence.page} '
-                                            f'and group={is_memorialized_sentence.group}.')
-                        if exists_sentence_in_headlist:
-                            raise Exception(f'This Sentece: "{has_sentence.foreign_language}" '
-                                            f'already exists in page={exists_sentence_in_headlist.page} '
-                                            f'and group={exists_sentence_in_headlist.group}.')
-                        else:
-                            instance.sentences.append(has_sentence)
-
-                            self.database.session.query(pagesection_sentence_assoc).filter(
-                                pagesection_sentence_assoc.c.sentence_id == has_sentence.id,
-                                pagesection_sentence_assoc.c.group == Group.NEW_PAGE.value
-                            ).update({'group': Group.REMOVED.value, 'distillated': True})
-
+                            pagesection_sentence_assoc.c.group == Group.NEW_PAGE.value
+                        ).update({'group': Group.REMOVED.value, 'distillated': True})
 
                     else:
                         instance.sentences.append(

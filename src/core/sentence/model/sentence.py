@@ -17,6 +17,9 @@ class Sentence(Entity):
         self.created_at       = created_at
         self.foreign_idiom    = foreign_idiom
         self.mother_idiom     = mother_idiom
+        self._foreign_language = None
+        self._mother_tongue = None
+
         self.foreign_language = foreign_language
         self.mother_tongue = mother_tongue
 
@@ -73,4 +76,7 @@ class Sentence(Entity):
         )
     
     def validate_data(self):
-        return super().validate_data()
+        messages = []
+
+        if not self.foreign_language:
+            return 'There are empty fiels.'

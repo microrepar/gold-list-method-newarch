@@ -98,7 +98,10 @@ class PageSectionModel(Base):
     created_by_id = Column(Integer, ForeignKey('page_section.id'))
     created_by = relationship('PageSectionModel', remote_side=[id], backref='children')
 
-    sentences = relationship('SentenceModel', secondary=pagesection_sentence_assoc, back_populates='page_sections', viewonly=False)
+    sentences = relationship('SentenceModel', 
+                             secondary=pagesection_sentence_assoc, 
+                             back_populates='page_sections', 
+                             viewonly=False)
 
     @property
     def translated_sentences(self) -> List[bool]:

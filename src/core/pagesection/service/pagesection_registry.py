@@ -25,11 +25,13 @@ class PageSectionRegistry(UseCase):
         if has_pagesection:
             result.msg = (f'Headlist cannot be registred because '
                           f'there is a headlist created at same date {entity.created_at}.')
+        
 
         next_page_number = self.repository.get_last_page_number(entity)
         entity.page_number = next_page_number
         entity.set_distillation_at()
         
+        result.msg = self.repository.validate_sentences(entity)
         result.msg = entity.validate_data()
 
         if result.qty_msg() > 0:
@@ -41,13 +43,14 @@ class PageSectionRegistry(UseCase):
                 clone_entity = entity.clone()
                 clone_entity.distillation_at = entity.created_at
                 clone_entity.distillated = True
-                self.repository.registry(entity=clone_entity)
+                clone_entity = self.repository.registry(entity=clone_entity)
 
             new_entity = self.repository.registry(entity=entity)
             result.entities = new_entity
 
         except Exception as error:
-            # TODO: remove registred entities
+            self.remove(clone_entity)
+            self.remove(new_entity)
             result.msg = str(error)
             result.entities = entity
             return result        

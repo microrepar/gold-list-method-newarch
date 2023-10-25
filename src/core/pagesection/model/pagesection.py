@@ -205,19 +205,23 @@ class PageSection(Entity):
         repeated_counter = dict()
 
         for sentence in self.sentences:
-            if sentence.foreign_language == '' or sentence.mother_tongue == '':
+            if sentence.foreign_language == '' \
+                    or sentence.mother_tongue == '' \
+                    or sentence.foreign_language is None \
+                    or sentence.mother_tongue is None:
                 empty_sentences += 1
 
             repeated_counter.setdefault(sentence.foreign_language, 0)
             repeated_counter[sentence.foreign_language] += 1
         
+        if empty_sentences > 0:
+            messages.append('There is one or more empty fields to headlist. Fill the gaps and try again.')
+            return messages
+                
         for k, v in repeated_counter.items():
             if v > 1:
                 messages.append(f'This sentence="{k}" is repeated into Headlist')
         
-        if empty_sentences > 0:
-            messages.append('There is one or more empty fields to headlist. Fill the gaps and try again.')
-
         if messages:
             return messages
 
