@@ -5,6 +5,12 @@
         "external": "tools",
         "pages": "rules",
         "user": "admin",
+        "notebook": "lib",
+        "pagesection": "lib",
+        "sentence": "lib",
+        "alembic": "config",
+        ".streamlit": "config",
+        ".documentation": "resource",
         "persistence": "database",
         "app_pages": "app"       
     },
