@@ -30,7 +30,7 @@ if FRAMEWORK_NAME is None:
 
 here = Path(os.path.dirname(__file__))
 for framework in here.iterdir():
-    if framework.is_dir() and framework.name == FRAMEWORK_NAME:
+    if framework.is_dir() and framework.name in FRAMEWORK_NAME:
         for repository in framework.iterdir():
             if repository.name.endswith('_repository.py') \
                     and not repository.name.startswith('_'):
