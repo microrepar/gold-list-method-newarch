@@ -39,8 +39,8 @@ class Controller:
 
         # Generates a list of repositories, from the type annotations in the method signature, 
         # __init__ from the UseCase to retrieve the repository name
-        repository_classes = [param.annotation for _, param in repository_signatures.parameters.items() \
-                   if param.annotation is not inspect.Parameter.empty]
+        repository_classes = [param.annotation for _, param in repository_signatures.parameters.items()
+                                if issubclass(param.annotation, Repository)]
 
         # Retrieves the class name from the repository that was defined in the __init__ param from the usecase
         if not repository_classes:
@@ -57,8 +57,8 @@ class Controller:
 
         # Generate a list of entities, from the type annotations in the controller signature, 
         # to use in the generic viewhelper
-        entity_classes = [param.annotation for _, param in entity_signatures.parameters.items() \
-                   if getattr(param.annotation, '__base__', None) == Entity]
+        entity_classes = [param.annotation for _, param in entity_signatures.parameters.items()
+                            if issubclass(param.annotation, Entity)]
 
         # Passes the request and the list of entities that the controller requires to the generic viewhelper. 
         # Attempts to create the objects requested in the controller parameter.
