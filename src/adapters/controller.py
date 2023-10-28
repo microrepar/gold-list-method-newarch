@@ -35,11 +35,11 @@ class Controller:
         
         # Checks in the usecase.__init__ signature which repository it requires by parameter 
         # and stores it in a list
-        repository_signatures = inspect.signature(usecase.__init__)
+        usecase_init_signatures = inspect.signature(usecase.__init__)
 
         # Generates a list of repositories, from the type annotations in the method signature, 
         # __init__ from the UseCase to retrieve the repository name
-        repository_classes = [param.annotation for _, param in repository_signatures.parameters.items()
+        repository_classes = [param.annotation for _, param in usecase_init_signatures.parameters.items()
                                 if issubclass(param.annotation, Repository)]
 
         # Retrieves the class name from the repository that was defined in the __init__ param from the usecase
