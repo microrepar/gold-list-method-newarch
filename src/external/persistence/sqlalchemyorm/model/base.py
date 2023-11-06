@@ -11,9 +11,52 @@ from sqlalchemy.orm import relationship
 from src.core.notebook import Notebook
 from src.core.pagesection import Group, PageSection
 from src.core.sentence import Sentence
+from src.core.user import User
 
 Base = declarative_base(metadata=MetaData(schema='gold_list_method'))
 metadata = Base.metadata
+
+
+class UserModel(Base):
+    __tablename__  = 'user'
+    __table_args__ = {"schema": "gold_list_method"}
+
+    id              = Column(Integer, primary_key=True)
+    created_at      = Column(Date, default=func.current_date())
+    name            = Column(String)
+    age             = Column(String)
+    email           = Column(String, unique=True)
+    username        = Column(String, unique=True)
+    password        = Column(String)
+    repeat_password = Column(String)
+
+    notebook_list = relationship('NotebookModel', back_populates='user')
+
+    @classmethod
+    def user_model_to_entity(cls, model: 'UserModel') -> User:
+        return User(
+            id_             = model.id,
+            created_at      = model.created_at,
+            name            = model.name,
+            age             = model.age,
+            email           = model.email,
+            username        = model.username,
+            password        = model.password,
+            repeat_password = model.repeat_password
+        )
+    
+    @classmethod
+    def user_entity_to_model(cls, entity: User) -> 'UserModel':
+        return cls(
+            id              = entity.id,
+            created_at      = entity.created_at,
+            name            = entity.name,
+            age             = entity.age,
+            email           = entity.email,
+            username        = entity.username,
+            password        = entity.password,
+            repeat_password = entity.repeat_password
+        )
 
 
 class NotebookModel(Base):
@@ -28,6 +71,9 @@ class NotebookModel(Base):
     days_period = Column(Integer)
     foreign_idiom = Column(String(100))
     mother_idiom = Column(String(100))
+
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship('UserModel', back_populates='notebook_list')
 
     page_section_list = relationship('PageSectionModel', back_populates='notebook')
     

@@ -1,8 +1,12 @@
 import datetime
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit_authenticator as stauth  # pip install streamlit-authenticator
+import yaml
 from st_pages import add_page_title
+from yaml.loader import SafeLoader
 
 from src.adapters import Controller
 
@@ -19,59 +23,134 @@ with placehold_msg:
 
 add_page_title()
  
-# st.title('NEW NOTEBOOK')
+config_file = Path(__file__).parent / 'config.yaml'
+with config_file.open('rb') as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
-with st.form("my_form"):   
-    st.write("Create Notebook")
-    notebook_name = st.text_input('Notebook name')
-    col1, col2 = st.columns(2)
-    foreign_idiom = col1.text_input('Foreign idiom')
-    mother_idiom = col2.text_input('Mother idiom')
-    col1, col2 = st.columns(2)
-    list_size = col1.slider("List size", min_value=10, max_value=25, value=20)
-    days_period = col2.slider("Days period", min_value=5, max_value=20, value=15)
+credentials = {'usernames': {}}
+config['credentials'] = credentials
 
-    # Every form must have a submit button.
-    submitted = st.form_submit_button("ADD NEW NOTEBOOK", type="primary", use_container_width=True)
+authenticator = stauth.Authenticate(
+    config['credentials'],              # credentials:      Dict['usernames', Dict['<alias>', Dict['email | name | password', str]]]
+    config['cookie']['name'],           # cookie:           str
+    config['cookie']['key'],            # cookie:           str
+    config['cookie']['expiry_days'],    # cookie:           str
+    config['preauthorized'],            # preauthorized:    List[str]
+)
 
-if submitted:
-    request = {
-        'resource': '/notebook/registry',
-        'notebook_name': notebook_name,
-        'notebook_list_size': list_size,
-        'notebook_days_period': days_period,
-        'notebook_foreign_idiom': foreign_idiom,
-        'notebook_mother_idiom': mother_idiom,
-    }
 
-    resp = controller(request=request)
+if st.session_state.username:
+    # ---- SIDEBAR ----
+    authenticator.logout(f"Logout | {st.session_state.username}", "sidebar")
 
-    msg = resp.get('messages')
-    
-    if msg:
-        for msg in resp.get('messages'):
-            placehold_msg_container.error(str(msg), icon="🚨")
+    with st.form("my_form"):   
+        st.write("Create Notebook")
+        notebook_name = st.text_input('Notebook name')
+        col1, col2 = st.columns(2)
+        foreign_idiom = col1.text_input('Foreign idiom')
+        mother_idiom = col2.text_input('Mother idiom')
+        col1, col2 = st.columns(2)
+        list_size = col1.slider("List size", min_value=10, max_value=25, value=20)
+        days_period = col2.slider("Days period", min_value=5, max_value=20, value=15)
+
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("ADD NEW NOTEBOOK", type="primary", use_container_width=True)
+
+    if submitted:
+        ######################################################
+        # FIND BY FIELD - USER
+        ######################################################
+        request = {
+            'resource': '/user/find_by_field',
+            'user_username': st.session_state.username
+        }
+        resp = controller(request=request)
+        messages = resp['messages']
+        entities = resp['entities']
+
+        if messages:
+            for msg in messages:
+                placehold_msg_container.error(msg, icon='🚨')
+            user_id = None
         else:
-            st.toast('Something went wrong!')
+            user_id = entities[-1].id
+        ######################################################
+
+        ######################################################
+        # REGISTRY NOTEBOOK
+        ######################################################
+        request = {
+            'resource': '/notebook/registry',
+            'notebook_name': notebook_name,
+            'notebook_list_size': list_size,
+            'notebook_days_period': days_period,
+            'notebook_foreign_idiom': foreign_idiom,
+            'notebook_mother_idiom': mother_idiom,
+            'notebook_user': {'user_id_': user_id},
+        }
+
+        resp = controller(request=request)
+
+        msg = resp.get('messages')
+        
+        if msg:
+            for msg in resp.get('messages'):
+                placehold_msg_container.error(str(msg), icon="🚨")
+            else:
+                st.toast('Something went wrong!')
+        else:
+            new_notebook = resp.get('entities', [None])[-1]
+            placehold_msg_container.success(f'{new_notebook} was inserted successfully!')
+            st.toast('Notebook was inserted successfully.')
+        ######################################################
+
+    ######################################################
+    # FIND BY FIELD - USER
+    ######################################################
+    request = {
+        'resource': '/user/find_by_field',
+        'user_username': st.session_state.username
+    }
+    resp = controller(request=request)
+    messages = resp['messages']
+    entities = resp['entities']
+
+    if messages:
+        for msg in messages:
+            placehold_msg_container.error(msg, icon='🚨')
+        user_id = None
     else:
-        new_notebook = resp.get('entities', [None])[-1]
-        placehold_msg_container.success(f'{new_notebook} was inserted successfully!')
-        st.toast('Notebook was inserted successfully.')
+        user_id = entities[-1].id
+    ######################################################
+    
+    ######################################################
+    # FIND BY FIELD - NOTEBOOK
+    ######################################################
+    request = {
+        'resource': '/notebook/find_by_field',
+        'notebook_user': {'user_id_': user_id}
+    }
+    resp = controller(request)
 
+    messages = resp['messages']
+    entities = resp['entities']
 
-request = {
-    'resource': '/notebook'
-}
-resp = controller(request)
+    if messages:
+        for msg in messages:
+            placehold_msg_container.error(msg, icon='🚨')
+        user_id = None
+    ######################################################
 
-st.divider()
+    st.divider()
 
-notebook_list = resp.get('entities')
-if notebook_list:
-    df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook_list], ignore_index=True)
-    st.markdown('#### Last Resgistred Notebooks')
-    st.dataframe(df.sort_values('id', ascending=False), hide_index=True, use_container_width=True)
-    st.markdown(f'Lines total: {df.shape[0]}')
+    notebook_list = resp.get('entities')
+    if notebook_list:
+        df = pd.concat([pd.DataFrame(n.data_to_dataframe()) for n in notebook_list], ignore_index=True)
+        st.markdown('#### Last Resgistred Notebooks')
+        st.dataframe(df.sort_values('id', ascending=False), hide_index=True, use_container_width=True)
+        st.markdown(f'Lines total: {df.shape[0]}')
+    else:
+        st.subheader('Notebooks')
+        st.markdown(':red[Atteption! There are no registred notebooks.]')
 else:
-    st.subheader('Notebooks')
-    st.markdown(':red[Atteption! There are no registred notebooks.]')
+    st.warning("Please access **[main page](/)** and enter your username and password.")

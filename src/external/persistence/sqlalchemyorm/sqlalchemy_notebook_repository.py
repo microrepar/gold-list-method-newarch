@@ -5,7 +5,7 @@ from src.core.notebook import Notebook, NotebookRepository
 from src.core.pagesection import PageSection
 from src.core.sentence import Sentence
 
-from .model.base import NotebookModel, PageSectionModel, SentenceModel
+from .model.base import NotebookModel, PageSectionModel, SentenceModel, UserModel
 from .settings.connection import DBConnectionHandler
 from ...persistence import repository_map
 
@@ -43,6 +43,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                             entity_sentence = SentenceModel.sentence_model_to_entity(instance_sentence)    
                             entity_page.sentences.append(entity_sentence)
                     
+                    entity.user = UserModel.user_model_to_entity(instance.user)
                     entity_notebook_list.append(entity)
             
                 return entity_notebook_list 
@@ -65,6 +66,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                     raise Exception(f'There is no notebook with id={notebook_id}.')
                 
                 entity_notebook_found = NotebookModel.notebook_model_to_entity(instance)
+                entity_notebook_found.user = UserModel.user_model_to_entity(instance.user)
                 entity_notebook_found.page_section_list = list()
                     
                 for instance_page in instance.page_section_list:
@@ -101,7 +103,10 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             if attr in 'created_at':
                 if isinstance(value, datetime.date):
                     value = value
-                    # value = pd.to_datetime(value).strftime("%Y-%m-%d")                
+                    # value = pd.to_datetime(value).strftime("%Y-%m-%d")
+            elif attr in 'user':
+                attr = 'user_id'
+                value = value.id
             elif attr in 'id name list_size days_period foreing_idiom mother_idiom':
                 ...
             else:
@@ -109,12 +114,12 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             
             kwargs[attr] = value
 
-
         try:
+            entity_notebook_list = []
+            
             with self.database.session.begin():
                 instance_list = self.database.session.query(NotebookModel).filter_by(**kwargs).all()
                 
-                entity_notebook_list = []
                 for instance in instance_list:
                     entity: Notebook = None
                     entity = NotebookModel.notebook_model_to_entity(instance)
@@ -135,9 +140,11 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                             entity_sentence = SentenceModel.sentence_model_to_entity(instance_sentence)    
                             entity_page.sentences.append(entity_sentence)
                     
+                    entity.user = UserModel.user_model_to_entity(instance.user)
                     entity_notebook_list.append(entity)
             
-                return entity_notebook_list 
+            return entity_notebook_list 
+        
         except Exception as error:
             self.database.session.rollback()
             raise error
@@ -147,10 +154,22 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
 
 
     def registry(self, entity: Notebook) -> Notebook:
+        user_id = entity.user.id
         instance = NotebookModel.notebook_entity_to_model(entity)
+        
         try:
-            with self.database.session.begin():                
+            with self.database.session.begin():
+                has_user = (self.database.session
+                            .query(UserModel)
+                            .filter_by(id=user_id)
+                            .one_or_none())
+                
+                if has_user is None:
+                    raise Exception(f'There is no User with username={username}')
+                
+                has_user.notebook_list.append(instance)
                 self.database.session.add(instance)                
+
             return NotebookModel.notebook_model_to_entity(instance)
         except Exception as error:
             self.database.session.rollback()

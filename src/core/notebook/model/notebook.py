@@ -3,19 +3,21 @@ from typing import List
 
 from src.core.shared.entity import Entity
 from src.core.shared.utils import date_to_string
+from src.core.user import User
 
 
 class Notebook(Entity):
     def __init__(self, *,
-                 name              : str=None,
-                 id_               : int=None,
-                 created_at        : datetime.date=None,
-                 updated_at        : datetime.date=None,
-                 list_size         : int=None,
-                 days_period       : int=None,
-                 page_section_list : List['PageSection']=list(),
-                 foreign_idiom     : str=None,
-                 mother_idiom      : str=None):
+                 name              : str = None,
+                 id_               : int = None,
+                 created_at        : datetime.date = None,
+                 updated_at        : datetime.date = None,
+                 list_size         : int = None,
+                 days_period       : int = None,
+                 page_section_list : List['PageSection'] = list(),
+                 foreign_idiom     : str = None,
+                 mother_idiom      : str = None,
+                 user              : User = None):
         
         self.name              = name
         self.id                = id_
@@ -26,6 +28,7 @@ class Notebook(Entity):
         self.page_section_list = page_section_list
         self.foreign_idiom     = foreign_idiom
         self.mother_idiom      = mother_idiom
+        self.user              = user
 
     def validate_data(self) -> List[str]:
         
@@ -45,6 +48,10 @@ class Notebook(Entity):
         return msg
 
     def data_to_dataframe(self):
+        user_id = None
+        if self.user is not None:
+            user_id = self.user.id
+
         return [
             {
                 'id'            : self.id,
@@ -55,6 +62,8 @@ class Notebook(Entity):
                 'days_period'   : self.days_period,
                 'foreign_idiom' : self.foreign_idiom,
                 'mother_idiom'  : self.mother_idiom,
+                'mother_idiom'  : self.mother_idiom,
+                'user_id'       : user_id
             }
         ]
     
