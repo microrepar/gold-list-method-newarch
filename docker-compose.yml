@@ -1,0 +1,43 @@
+version: '3.5'
+services:
+
+  web:
+    build: .
+    container_name: "streamlit_app"
+    command: streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+    volumes:
+      - .:/app
+    env_file: .env
+    restart: always
+    ports:
+      - "8501:8501"
+    stdin_open: true
+    tty: true
+    depends_on:
+        - db_streamlit_app
+    networks:
+      - api_network
+  db_streamlit_app:
+    image: "postgres:11"
+    container_name: "db_streamlit_app"
+    restart: always
+    env_file: .env
+    ports:
+      - "54321:5432"
+    volumes:
+      - ./.data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - api_network
+
+networks:
+  api_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET}
+volumes:
+  static_volume:

@@ -38,6 +38,7 @@ authenticator = stauth.Authenticate(
     config['preauthorized'],            # preauthorized:    List[str]
 )
 
+st.session_state['username'] = st.session_state['username']
 
 if st.session_state.username:
     # ---- SIDEBAR ----

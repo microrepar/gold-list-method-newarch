@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: requirements
         name: requirements
-        entry: cmd /C 'C:\Users\codigo100cera\Envs\geo-data-viz-venv\Scripts\pip.exe freeze > requirements.txt && git add requirements.txt'
+        entry: cmd /C 'C:\Users\codigo100cera\Envs\streamlit-python311-newarch\Scripts\pip.exe freeze > requirements.txt && git add requirements.txt'
         language: system
         pass_filenames: false
         stages: [commit]

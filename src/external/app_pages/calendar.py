@@ -36,7 +36,7 @@ authenticator = stauth.Authenticate(
     config['preauthorized'],            # preauthorized:    List[str]
 )
 
-
+st.session_state['username'] = st.session_state['username']
 if st.session_state.username:
     # ---- SIDEBAR ----
     authenticator.logout(f"Logout | {st.session_state.username}", "sidebar")

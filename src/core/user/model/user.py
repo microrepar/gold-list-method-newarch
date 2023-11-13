@@ -38,3 +38,17 @@ class User(Entity):
             f'repeat_password={self.repeat_password}'
             ')'
         )
+    
+    def data_to_dataframe(self):
+        return [
+            {
+                'id': self.id,
+                'username': self.username,
+                'created_at': self.created_at,
+                'name': self.name,
+                'email': self.email,
+                # 'age': self.age,
+                # 'password': self.password,
+                # 'repeat_password': self.repeat_password,
+            }
+        ]

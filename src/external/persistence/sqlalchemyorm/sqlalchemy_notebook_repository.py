@@ -165,7 +165,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
                             .one_or_none())
                 
                 if has_user is None:
-                    raise Exception(f'There is no User with username={username}')
+                    raise Exception(f'There is no User with username={entity.username}')
                 
                 has_user.notebook_list.append(instance)
                 self.database.session.add(instance)                

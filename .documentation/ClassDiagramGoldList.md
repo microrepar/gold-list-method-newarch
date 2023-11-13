@@ -1,5 +1,15 @@
 ```mermaid
     classDiagram
+        class User{
+            - id: Long
+            - name: String
+            - username: String
+            - created_at: Date
+            - password: str
+            
+            + data_validate(): Bool
+        }
+
         class Notebook {
             - id: Long
             - name: String
@@ -42,6 +52,7 @@
             NEW_PAGE = "NP"
         }
     
+        User "1"            -->     "0..*" Notebook
         Notebook "1"        <-->    "0..*" PageSection
         PageSection "0..1"   -->    "1" PageSection: createdby
         PageSection "0..*"   -->    "1..*" Sentence

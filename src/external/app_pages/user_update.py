@@ -1,6 +1,7 @@
 import pickle
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st  # pip install streamlit
 import streamlit_authenticator as stauth  # pip install streamlit-authenticator
 import yaml
@@ -52,23 +53,23 @@ authenticator = stauth.Authenticate(
     config['preauthorized'],            # preauthorized:    List[str]
 )
 
+
+st.session_state['username'] = st.session_state['username']
 if st.session_state.username:
     # ---- SIDEBAR ----
     authenticator.logout(f"Logout | {st.session_state.username}", "sidebar")
 
-    def on_change_field():
-        st.rerun()
-
     try:
         col1, col2 = st.columns(2)
         selected_username = col1.selectbox('Username', list(credentials['usernames']))
-
-
-
         field = col2.selectbox('Field', ['name', 'email'])
+
+        new_value = None
+        actual_value = None
+
         with st.form("my_form"):   
             st.write("### Update user detail")
-            st.text_input('Actual value', 
+            actual_value = st.text_input('Actual value', 
                           value=credentials['usernames'][selected_username][field], 
                           disabled=True)
             new_value = st.text_input('New value')
@@ -95,11 +96,35 @@ if st.session_state.username:
                 raise Exception('\n\n'.join(messages))
             #############################################################
 
-            st.success('User registered successfully')       
+            st.success(f'User change {field} from "{actual_value}" to "{new_value}" registred successfully')       
 
     except Exception as e:
         placeholder_msg.error(e)
         st.error(e)
+
+    #############################################################
+    ### GET ALL USERS ###
+    #############################################################
+    controller = Controller()
+    request    = {'resource': '/user'}
+    resp       = controller(request=request)
+    #############################################################
+    messages = resp['messages']
+    entities = resp['entities']
+
+    if messages:
+        placeholder_msg.erro('\n\n'.join(messages), icon='🚨')
+    #############################################################
+
+    st.divider()
+
+    if entities:
+        st.markdown('### Users')
+        df = pd.concat([pd.DataFrame(u.data_to_dataframe()) for u in entities], ignore_index=True)
+        st.dataframe(df, hide_index=True, use_container_width=True)
+    else:
+        st.markdown('### Users')
+        st.markdown(':red[Atteption! There are no registred users.]')
 
 else:
     st.warning("Please access **[main page](/)** and enter your username and password.")
