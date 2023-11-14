@@ -1,5 +1,6 @@
 import pickle
 from pathlib import Path
+import getpass
 
 import streamlit_authenticator as stauth
 
@@ -8,7 +9,7 @@ print('***CREATE USER***')
 name = input('name (add your name): ')
 username = input('username: ')
 email = input('email: ')
-password = input('password : ')
+password = getpass.getpass()
 
 hashed_passwords = stauth.Hasher([password]).generate()
 
