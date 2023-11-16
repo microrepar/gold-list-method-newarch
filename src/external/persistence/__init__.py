@@ -4,10 +4,8 @@
 import os
 from importlib import import_module
 from pathlib import Path
-from src.core.shared.repository import Repository
-from dotenv import load_dotenv
 
-load_dotenv()
+from config import Config
 
 
 class RepositoryNotFoundError():
@@ -22,7 +20,7 @@ def repository_map(cls):
     repositories.update({cls.__base__.__name__: cls})
     return cls
 
-FRAMEWORK_NAME = os.getenv('FRAMEWORK_NAME')
+FRAMEWORK_NAME = Config.FRAMEWORK_NAME
 
 if FRAMEWORK_NAME is None:
     raise Exception('There is no a repository framework name defined in enviroment.')

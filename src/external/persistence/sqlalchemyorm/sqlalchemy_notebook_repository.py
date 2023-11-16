@@ -16,8 +16,10 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
 
     def __init__(self):
         self.database = DBConnectionHandler()
+        pass
 
     def get_all(self) -> List[Notebook]:
+        
         try:
             with self.database.session.begin():
                 instance_list = self.database.session.query(NotebookModel).all()
@@ -56,6 +58,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
          
     
     def get_by_id(self, entity: Notebook) -> Notebook:
+        
         try:
             notebook_id = entity.id
 
@@ -90,10 +93,11 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             raise error
         
         finally:
-            self.database.session.close()
+            self.database.close()
 
     
     def find_by_field(self, entity: Notebook) -> List[Notebook]:
+        
         filters = dict([v for v in vars(entity).items() if not v[0].startswith('_') and bool(v[-1])])
 
         kwargs = {}
@@ -154,6 +158,7 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
 
 
     def registry(self, entity: Notebook) -> Notebook:
+        
         user_id = entity.user.id
         instance = NotebookModel.notebook_entity_to_model(entity)
         
@@ -175,4 +180,4 @@ class SqlAlchemyNotebookRepository(NotebookRepository):
             self.database.session.rollback()
             raise error
         finally:
-            self.database.session.close()
+            self.database.close()

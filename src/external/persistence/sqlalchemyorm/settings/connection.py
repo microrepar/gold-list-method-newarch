@@ -1,43 +1,36 @@
 """_summary_
 adapted by: https://github.com/programadorLhama/CleanArch/blob/master/src/infra/db/settings/connection.py
 """
-import os
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
 
-DB_DIALECT  = os.getenv('DB_DIALECT')
-DB_USER     = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_HOST     = os.getenv('DB_HOST')
-DB_PORT     = os.getenv('DB_PORT')
-DB_DATABASE = os.getenv('DB_DATABASE')
-DB_SCHEMA   = os.getenv('DB_SCHEMA')
+from config import Config
 
 
 class DBConnectionHandler:
 
     def __init__(self) -> None:
-        self._connection_string = "{}://{}:{}@{}:{}/{}".format(
-            DB_DIALECT,
-            DB_USER,
-            DB_PASSWORD,
-            DB_HOST,
-            DB_PORT,
-            DB_DATABASE
-        )
-        self._engine = self._create_database_engine()
-        self._get_section()
-
+        self._connection_string = Config.DATABASE_URL
+        self._session = None
+        
     def _create_database_engine(self):
         engine = create_engine(self._connection_string)
         return engine
 
-    def get_engine(self):
-        return self._engine 
-
     def _get_section(self):
+        self._engine = self._create_database_engine()
         session_make = sessionmaker(bind=self._engine)
-        self.session = session_make()
-
+        self._session = session_make()
+    
+    @property
+    def session(self):
+        if self._session:
+            return self._session        
+        
+        self._get_section()
+        return self._session
+    
     def close(self):
-        self.session.close()
+        if self._session:
+            self._session.close()
+            self._session = None

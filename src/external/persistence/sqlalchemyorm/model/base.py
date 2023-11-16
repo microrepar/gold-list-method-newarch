@@ -13,13 +13,14 @@ from src.core.pagesection import Group, PageSection
 from src.core.sentence import Sentence
 from src.core.user import User
 
-Base = declarative_base(metadata=MetaData(schema='gold_list_method'))
+# Base = declarative_base(metadata=MetaData(schema='gold_list_method'))
+Base = declarative_base()
 metadata = Base.metadata
 
 
 class UserModel(Base):
     __tablename__  = 'user'
-    __table_args__ = {"schema": "gold_list_method"}
+    # __table_args__ = {"schema": "gold_list_method"}
 
     id              = Column(Integer, primary_key=True)
     created_at      = Column(Date, default=func.current_date())
@@ -61,7 +62,7 @@ class UserModel(Base):
 
 class NotebookModel(Base):
     __tablename__ = 'notebook'
-    __table_args__ = {"schema": "gold_list_method"}
+    # __table_args__ = {"schema": "gold_list_method"}
 
     id = Column(Integer, primary_key=True)
     name = Column(String(200), unique=True)
@@ -125,7 +126,7 @@ pagesection_sentence_assoc = Table(
 
 class PageSectionModel(Base):
     __tablename__ = 'page_section'
-    __table_args__ = {"schema": "gold_list_method"}
+    # __table_args__ = {"schema": "gold_list_method"}
 
     id = Column(Integer, primary_key=True)
     section_number = Column(Integer)
@@ -213,7 +214,7 @@ class PageSectionModel(Base):
 
 class SentenceModel(Base):
     __tablename__ = 'sentence'
-    __table_args__ = {"schema": "gold_list_method"}
+    # __table_args__ = {"schema": "gold_list_method"}
 
     id = Column(Integer, primary_key=True)
     created_at = Column(Date, default=func.current_date())

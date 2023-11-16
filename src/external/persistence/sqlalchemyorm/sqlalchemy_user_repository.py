@@ -12,8 +12,10 @@ class SlalchemyUserRepository(UserRepository):
 
     def __init__(self):
         self.database = DBConnectionHandler()
+        pass
     
     def registry(self, entity: User) -> User:
+        
         model = UserModel.user_entity_to_model(entity)
         try:
             with self.database.session.begin():
@@ -24,17 +26,24 @@ class SlalchemyUserRepository(UserRepository):
         
         except Exception as error:
             self.database.session.rollback()
-            self.database.close()
             raise error
+        finally:
+            self.database.close()
 
     def get_all(self, entity: User) -> List[User]:
-        model_list = self.database.session.query(UserModel).all()
+        
+        try:
+            model_list = self.database.session.query(UserModel).all()
+            entity_list = [UserModel.user_model_to_entity(m) for m in model_list]
 
-        entity_list = [UserModel.user_model_to_entity(m) for m in model_list]
-
-        return entity_list
+            return entity_list
+        except:
+            pass
+        finally:
+            self.database.close()
         
     def update(self, entity: User) -> User:
+        
         try:
             with self.database.session.begin():
                 model : UserModel = (self.database.session
@@ -62,7 +71,7 @@ class SlalchemyUserRepository(UserRepository):
             self.database.close()
     
     def find_by_field(self, entity: User) -> List[User]:
-
+        
         filters = dict([v for v in vars(entity).items() if not v[0].startswith('_') and bool(v[-1])])
 
         kwargs = {}
@@ -96,7 +105,11 @@ class SlalchemyUserRepository(UserRepository):
 
     
     def remove(self, entity: User) -> bool:
+        
+        self.database.close()
         raise Exception('"remove" method in "SlalchemyUserRepository" is not implemented')
 
     def get_by_id(self, entity: User) -> User:
+        
+        self.database.close()
         raise Exception('"get_by_id" method in "SlalchemyUserRepository" is not implemented')

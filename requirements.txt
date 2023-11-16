@@ -58,7 +58,7 @@ six==1.16.0
 smmap==5.0.1
 SQLAlchemy==1.4.49
 st-pages==0.4.5
-streamlit==1.28.1
+streamlit==1.28.2
 streamlit-authenticator==0.2.3
 streamlit-calendar==0.6.0
 streamlit-folium==0.15.0

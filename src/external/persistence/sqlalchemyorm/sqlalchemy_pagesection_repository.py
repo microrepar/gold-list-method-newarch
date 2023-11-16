@@ -18,8 +18,10 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
 
     def __init__(self):
         self.database = DBConnectionHandler()
+        pass
 
     def get_all(self) -> List[PageSection]:
+        
         try:
             instance_page_list = self.database.session.query(PageSectionModel).all()
             
@@ -65,10 +67,12 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:
             self.database.session.rollback()
             return str(error)
+        finally:
+            self.database.close()
 
 
     def find_by_field(self, entity: PageSection) -> List[PageSection]:
-
+        
         filters = dict([v for v in vars(entity).items() if not v[0].startswith('_') and bool(v[-1])])
 
         kwargs = {}
@@ -122,8 +126,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:
             self.database.session.rollback()
             raise error
+        finally:
+            self.database.close()
 
     def get_last_page_number(self, entity: PageSection=None) -> int:
+        
         try:
             with self.database.session.begin():
 
@@ -144,8 +151,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:
             self.database.session.rollback()
             raise error
+        finally:
+            self.database.close()
 
     def update(self, entity: PageSection) -> PageSection:
+        
         try:
             with self.database.session.begin():
                 instance: PageSectionModel = (self.database.session
@@ -191,6 +201,7 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
             self.database.close()
 
     def get_sentences_by_group(self, entity: PageSection):
+        
         try:
             results = None
             with self.database.session.begin():
@@ -211,8 +222,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:            
             self.database.session.rollback()
             raise error
+        finally:
+            self.database.close()
 
     def validate_sentences(self, entity: PageSection) -> List[str]:
+        
         messages = []
         try:
             with self.database.session.begin():
@@ -261,9 +275,11 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:
             self.database.session.rollback()
             raise error
+        finally:
+            self.database.close()
 
     def remove(self, entity: PageSection):
-
+        
         if entity.id is None:
             return
 
@@ -294,8 +310,12 @@ class SqlAlchemyPageSectionRepository(PageSectionRepository):
         except Exception as error:
             self.database.session.rollback()
             raise error
+        
+        finally:
+            self.database.close()
 
     def registry(self, entity: PageSection) -> PageSection:
+        
         try:
             instance = None
             with self.database.session.begin():

@@ -23,7 +23,7 @@ class NotebookRegistry(UseCase):
         try:
             new_notebook = self.repository.registry(notebook)
         except Exception as error:
-            if 'already exists' in str(error):
+            if 'already exists' in str(error) or 'UNIQUE constraint failed: notebook.name' in str(error):
                 result.msg = f'Notebook name "{notebook.name}" already exists. Choice another name and try again!'
             else:
                 result.msg = str(error)
