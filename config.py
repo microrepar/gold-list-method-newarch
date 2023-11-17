@@ -17,7 +17,7 @@ class Config:
     FRAMEWORK_NAME = os.getenv('FRAMEWORK_NAME')
 
     if DATABASE_URL is None:
-        if DB_DIALECT in 'postgresql mysql':
+        if DB_DIALECT and DB_DIALECT in 'postgresql mysql':
             DATABASE_URL = f"{DB_DIALECT}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}"    
         else:
             DATABASE_URL = f"sqlite:///{Path(__file__).parent}/app.db"
