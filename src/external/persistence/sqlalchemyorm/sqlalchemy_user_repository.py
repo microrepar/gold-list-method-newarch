@@ -55,6 +55,7 @@ class SlalchemyUserRepository(UserRepository):
                     raise Exception(f'There is no User with id={entity.id}')
                 
                 model.name            = entity.name
+                model.status          = entity.status
                 model.age             = entity.age
                 model.email           = entity.email
                 model.username        = entity.username
@@ -104,12 +105,20 @@ class SlalchemyUserRepository(UserRepository):
             self.database.close()
 
     
-    def remove(self, entity: User) -> bool:
-        
-        self.database.close()
+    def remove(self, entity: User) -> bool:        
         raise Exception('"remove" method in "SlalchemyUserRepository" is not implemented')
+        # model = None
+        # try:
+        #     with self.database.session.begin():
+        #         model = self.database.session.query(UserModel).filter_by(id=entity.id).firt()
+        #         self.database.session.delete(model)
+        # except Exception as error:
+        #     self.database.session.rollback()
+        #     return False
+        # finally:
+        #     self.database.close()
+
+
 
     def get_by_id(self, entity: User) -> User:
-        
-        self.database.close()
         raise Exception('"get_by_id" method in "SlalchemyUserRepository" is not implemented')

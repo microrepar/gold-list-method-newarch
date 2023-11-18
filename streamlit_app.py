@@ -131,3 +131,5 @@ st.header(subtitle)
 # Use HTML para justificar o texto
 for paragrafo in introdution.splitlines():
     st.markdown(f'<p style="text-align: justify;">{paragrafo}</p>', unsafe_allow_html=True)
+
+st.markdown('[E-book here](https://www.languagementoring.com/wp-content/uploads/2018/11/The-Goldlist-method-in-a-Nutshell-Language-mentoring.pdf)')

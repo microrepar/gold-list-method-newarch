@@ -77,7 +77,7 @@ if st.session_state.username:
     entities = resp['entities']
 
     if messages:
-        st.erro('\n\n'.join(messages), icon='🚨')
+        st.error('\n\n'.join(messages), icon='🚨')
     #############################################################
 
     st.divider()
@@ -102,6 +102,7 @@ if st.session_state.username:
             st.session_state.flag_reset = not st.session_state.flag_reset
         
         placeholder_alert_empty = st.empty()
+        placeholder_error_empty = st.empty()
         
         if st.session_state.flag_reset:
             editor_key = 'edited_data1'
@@ -124,44 +125,57 @@ if st.session_state.username:
             
             flag_contem_admin = False
             
-            user_id_list = list
+            error_messages = []
+            alert_messages = []            
+            username_list = list()
             for index in st.session_state[editor_key]['deleted_rows']:
-                user_id_list.append(df.iloc[index]['id'])
-                username = df.iloc[index]['username']
-
-                if 'admin' in username:
+                
+                username = df.iloc[index]['username']                
+                if username and 'admin' in username:
                     flag_contem_admin = True
-                    break
+                
+                else:
+                    user_id = df.iloc[index]['id']
+                    username_list.append(username)
+                    #############################################################
+                    ### DELETE USER BY ID ###
+                    #############################################################
+                    controller = Controller()
+                    request    = {'resource': '/user/delete',
+                                'user_id_': user_id}
+                    resp       = controller(request=request)
+                    #############################################################
+                    messages = resp['messages']
+                    entities = resp['entities']
 
-            if not flag_contem_admin:
-                ...
-                # with config_file.open('w') as file:
-                #     yaml.dump(config, file, default_flow_style=False)                    
-            else:
-                placeholder_alert_empty.error('O usuário "admin" não pode ser removido, efetue o reset e exclua qualquer registro de usuário exceto o admin.')
-                st.session_state[editor_key]['deleted_rows'] = []
+                    if messages:
+                        error_messages += messages
+
+                    st.write(request)                        
+                    st.write(resp)                        
+                    #############################################################
+                
+            if flag_contem_admin:
+                alert_messages.append('User "admin" cannot be removed, remove any user except the admin user.')
+            
+            if error_messages:
+                placeholder_error_empty.error('\n\n'.join(error_messages), icon='🚨')
+            
+            if alert_messages:
+                placeholder_alert_empty.warning('\n\n'.join(alert_messages), icon='⚠️')
+
+            st.session_state[editor_key]['deleted_rows'] = []
         
         
         if st.session_state[editor_key].get('edited_rows'):                
-            placeholder_alert_empty.error('Não é permitido a alteração de registros pelo quadro, por favor use o formulário para adicionar novos usuários.', icon='🚨')
-            # try:
-            #     with config_file.open('w') as file:
-            #         yaml.dump(config, file, default_flow_style=False)                    
-                
-            #     placeholder_alert_empty.success('Atualização aplicada com sucesso')
-            #     st.session_state[editor_key]['edited_rows'] = {}
-            # except Exception as error:
-            #     placeholder_alert_empty.error(str(error), icon='🚨')
+            placeholder_alert_empty.error('Changing records via the board is not allowed, please use the form to add new users.', icon='🚨')
 
         if st.session_state[editor_key].get('added_rows'):
-            placeholder_alert_empty.error('Não é permitido a adição de novos registros pelo quadro, por favor use o formulário para adicionar novos usuários.', icon='🚨')
+            placeholder_alert_empty.error('Adding new records via the board is not allowed, please use the form to add new users.', icon='🚨')
     
-
-
     else:
         st.markdown('### Users')
         st.markdown(':red[Atteption! There are no registred users.]')
-
 
 else:
     st.warning("Please access **[main page](/)** and enter your username and password.")

@@ -24,6 +24,7 @@ class UserModel(Base):
 
     id              = Column(Integer, primary_key=True)
     created_at      = Column(Date, default=func.current_date())
+    status          = Column(String)
     name            = Column(String)
     age             = Column(String)
     email           = Column(String, unique=True)
@@ -38,6 +39,7 @@ class UserModel(Base):
         return User(
             id_             = model.id,
             created_at      = model.created_at,
+            status          = model.status,
             name            = model.name,
             age             = model.age,
             email           = model.email,
@@ -51,6 +53,7 @@ class UserModel(Base):
         return cls(
             id              = entity.id,
             created_at      = entity.created_at,
+            status          = entity.status,
             name            = entity.name,
             age             = entity.age,
             email           = entity.email,
