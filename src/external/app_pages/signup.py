@@ -150,9 +150,6 @@ if st.session_state.username:
 
                     if messages:
                         error_messages += messages
-
-                    st.write(request)                        
-                    st.write(resp)                        
                     #############################################################
                 
             if flag_contem_admin:
