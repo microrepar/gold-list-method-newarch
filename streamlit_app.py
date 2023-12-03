@@ -74,7 +74,7 @@ if authentication_status:
         show_pages(
             [   Page("streamlit_app.py", "GOLD LIST METHOD", "🪙"),
                 Page("src/external/app_pages/calendar.py", "Calendar", "🗓️"),
-                # Page("src/external/app_pages/maps.py", "Folium", "🗺️"),
+                Page("src/external/app_pages/maps.py", "Folium", "🗺️"),
                 Page("src/external/app_pages/distillation.py", "Distillation", "🧠"),
                 # Section(name="Notebooks", icon=":books:"),
                 # # Can use :<icon-name>: or the actual icon 

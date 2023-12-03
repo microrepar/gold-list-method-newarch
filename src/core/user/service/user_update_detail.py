@@ -59,5 +59,5 @@ class UserUpdateDetail(UseCase):
                 result.msg = str(error)
             result.entities = entity
             return result
-        ###################################
+
 

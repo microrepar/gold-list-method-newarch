@@ -31,7 +31,7 @@ class UserGetAll(UseCase):
             if len(user_list) > 0:
                 result.entities = user_list
             else:
-                result.entities = entity
+                result.entities = user_list
                 result.msg = 'There are no users in database.'
 
             return result

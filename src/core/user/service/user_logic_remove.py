@@ -25,8 +25,6 @@ class UserLogicRemove(UseCase):
             user_exists = user_exists[-1]
         
         user_exists.status = 'removed'
-
-        print('>>>>>>>>>>>>', user_exists)
         
         try:
             updated_user = self.repository.update(user_exists)
@@ -36,38 +34,3 @@ class UserLogicRemove(UseCase):
             result.msg = str(error)
             result.entities = entity
             return result
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        result = Result()        
-        try:
-            entity.status = 'removed'
-            removed = self.repository.update(entity)
-            if not removed:
-                result.msg = f'User id={entity.id} was not removed.'
-            
-            result.entities = entity
-            return result
-        
-        except Exception as error:
-            result.msg = str(error)
-            result.entities = entity
-            return result
-        ###################################
-
