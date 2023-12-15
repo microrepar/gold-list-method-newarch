@@ -1,4 +1,6 @@
 """shared module
 """
 
-from src.core.shared.usecase import UseCase
+from .entity import Entity
+from .repository import Repository
+from .usecase import UseCase

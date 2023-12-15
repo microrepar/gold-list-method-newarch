@@ -46,8 +46,8 @@ folium.CircleMarker(
     location=[-23.519125 , -46.1852867],
     radius=5,
     popup="CENTRO MOGI DAS CRUZES",
-    # color="#3186cc",
-    color="red",
+    color="#3186cc",
+    # color="red",
     fill=True,
     fill_color="#3186cc",
 ).add_to(m)
