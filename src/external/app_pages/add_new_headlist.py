@@ -21,7 +21,7 @@ controller = Controller()
 
 # Either this or add_indentation() MUST be called on each page in your
 # app to add indendation in the sidebar
-add_page_title()  # Optional method to add title and icon to current page
+add_page_title(layout="wide")  # Optional method to add title and icon to current page
 
 config_file = Path(__file__).parent / 'config.yaml'
 with config_file.open('rb') as file:

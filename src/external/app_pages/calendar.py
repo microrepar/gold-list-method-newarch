@@ -19,7 +19,7 @@ st.set_page_config(layout='wide')
 placehold_container_msg = st.container()
 placehold_container_msg.empty()
 
-add_page_title()  # Optional method to add title and icon to current page
+add_page_title(layout="wide")  # Optional method to add title and icon to current page
 
 config_file = Path(__file__).parent / 'config.yaml'
 with config_file.open('rb') as file:

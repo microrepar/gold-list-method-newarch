@@ -17,7 +17,7 @@ st.set_page_config(layout='wide')
 placeholder_container_msg = st.container()
 controller = Controller()
 
-add_page_title()  # Optional method to add title and icon to current page
+add_page_title(layout="wide")  # Optional method to add title and icon to current page
 
 def get_group_dataframe(pagesection):    
 

@@ -21,7 +21,7 @@ placehold_msg = st.empty()
 with placehold_msg:
     placehold_msg_container = st.container()
 
-add_page_title()
+add_page_title(layout="wide")
  
 config_file = Path(__file__).parent / 'config.yaml'
 with config_file.open('rb') as file:

@@ -17,6 +17,7 @@ from src.adapters.controller import Controller
 load_dotenv()
 
 st.set_page_config(layout='wide')
+add_page_title(layout="wide")
 
 placeholder_msg = st.empty()
 
