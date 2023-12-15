@@ -17,7 +17,6 @@ from src.adapters.controller import Controller
 load_dotenv()
 
 st.set_page_config(layout='wide')
-add_page_title(layout="wide")
 
 placeholder_msg = st.empty()
 
@@ -108,7 +107,8 @@ else:
     )
 
 
-add_page_title()  # Optional method to add title and icon to current page
+add_page_title(layout="wide")
+  # Optional method to add title and icon to current page
 
 title = 'GOLD LIST METHOD'
 subtitle = 'The Key to Effective Language Learning'
