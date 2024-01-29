@@ -19,9 +19,9 @@ class Config:
         DB_SCHEMA    = st.secrets.get('DB_SCHEMA')
         DB_USER      = st.secrets.get('DB_USER')
         
-        REDIS_HOST         = st.secrets.get('REDIS_HOST')
-        REDIS_PORT         = st.secrets.get('REDIS_PORT')
-        REDIS_PASSWORD     = st.secrets.get('REDIS_PASSWORD')
+        REDIS_HOST     = st.secrets.get('REDIS_HOST')
+        REDIS_PORT     = st.secrets.get('REDIS_PORT')
+        REDIS_PASSWORD = st.secrets.get('REDIS_PASSWORD')
 
         DB_FRAMEWORK = st.secrets.get('DB_FRAMEWORK')
 
@@ -35,9 +35,9 @@ class Config:
         DB_SCHEMA    = os.getenv('DB_SCHEMA')
         DB_USER      = os.getenv('DB_USER')
 
-        REDIS_HOST         = os.getenv('REDIS_HOST')
-        REDIS_PORT         = os.getenv('REDIS_PORT')
-        REDIS_PASSWORD     = os.getenv('REDIS_PASSWORD')
+        REDIS_HOST     = os.getenv('REDIS_HOST')
+        REDIS_PORT     = os.getenv('REDIS_PORT')
+        REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
         DB_FRAMEWORK = os.getenv('DB_FRAMEWORK')
 
